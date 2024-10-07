@@ -1,1 +1,1 @@
-# javascript functionality
+// javascript functionality

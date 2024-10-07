@@ -5,7 +5,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
 
 # Local modules
-from app.models import User
+from backend.app.models import User
 
 
 class LoginForm(FlaskForm):

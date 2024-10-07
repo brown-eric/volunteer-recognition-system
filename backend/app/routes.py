@@ -3,9 +3,9 @@ from flask import Blueprint, redirect, url_for, render_template, flash
 from flask_login import login_user, logout_user, current_user, login_required
 
 # Local modules
-from app.models import User
-from app.extensions import db, bcrypt, login_manager
-from app.forms import LoginForm, RegistrationForm
+from backend.app.models import User
+from backend.app.extensions import db, bcrypt, login_manager
+from backend.app.forms import LoginForm, RegistrationForm
 
 routes_bp = Blueprint('routes', __name__, url_prefix="/")
 
