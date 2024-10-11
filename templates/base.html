@@ -23,14 +23,16 @@
 {% endif %}
 {% endwith %}
 <div>
-            Microblog:
-            <a href="{{ url_for('routes.home') }}">Home</a>
-            {% if current_user.is_anonymous %}
-            <a href="{{ url_for('routes.login') }}">Login</a>
-            {% else %}
-            <a href="{{ url_for('routes.user_profile', name=current_user.name) }}">Profile</a>
-            <a href="{{ url_for('routes.logout') }}">Logout</a>
-            {% endif %}
+    <!-- Navigation Bar from
+    https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vi-profile-page-and-avatars-->
+    Navigation:
+    <a href="{{ url_for('routes.home') }}">Home</a>
+    {% if current_user.is_anonymous %}
+        <a href="{{ url_for('routes.login') }}">Login</a>
+    {% else %}
+        <a href="{{ url_for('routes.user_profile', name=current_user.name) }}">Profile</a>
+        <a href="{{ url_for('routes.logout') }}">Logout</a>
+    {% endif %}
         </div>
 <main class="p-2">
     {% block content %}

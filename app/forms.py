@@ -23,7 +23,7 @@ class RegistrationForm(FlaskForm):
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
         DataRequired(),
-        Email()
+        Email("Must be a valid email address.")
     ], render_kw={'placeholder': 'example@email.com'})
     password = PasswordField('Password', validators=[
         DataRequired(),
@@ -36,11 +36,13 @@ class RegistrationForm(FlaskForm):
                                      render_kw={'placeholder': 'Confirm your password'})
     submit = SubmitField('Register')
 
+    # Prevents duplicate accounts
     def validate_email(self, email):
         existing_user = User.query.filter_by(email=email.data).one_or_none()
         if existing_user:
             raise ValidationError('Email address already registered.')
 
     def validate_password(self, password):
+        # Consider adding special character requirements
         if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
             raise ValidationError('Password must contain at least one letter and one digit.')
