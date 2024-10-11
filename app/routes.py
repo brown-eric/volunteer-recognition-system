@@ -3,9 +3,9 @@ from flask import Blueprint, redirect, url_for, render_template, flash
 from flask_login import login_user, logout_user, current_user, login_required
 
 # Local modules
-from backend.app.models import User
-from backend.app.extensions import db, bcrypt, login_manager
-from backend.app.forms import LoginForm, RegistrationForm
+from app.models import User
+from app.extensions import db, bcrypt, login_manager
+from app.forms import LoginForm, RegistrationForm
 
 routes_bp = Blueprint('routes', __name__, url_prefix="/")
 
@@ -71,6 +71,11 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
+@routes_bp.route("/user/<name>")
+@login_required
+def user_profile(name):
+    user = User.query.filter_by(name=name).one_or_none()
+    return render_template('user.html', user=user)
 
 @routes_bp.route("/logout", methods=['GET', 'POST'])
 @login_required

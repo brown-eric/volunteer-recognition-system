@@ -12,19 +12,19 @@ def create_app(debug: bool = False) -> Flask:
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
 
     # Initialize extensions
-    from backend.app.extensions import db, bcrypt, csrf, login_manager
+    from app.extensions import db, bcrypt, csrf, login_manager
     db.init_app(app)
     csrf.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
 
     # Create database tables
-    from backend.app import models
+    from app import models
     with app.app_context():
         db.create_all()
 
     # Register blueprints
-    from backend.app.routes import routes_bp
+    from app.routes import routes_bp
     app.register_blueprint(routes_bp)
 
     return app
