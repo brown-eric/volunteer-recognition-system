@@ -1,8 +1,7 @@
 # Flask modules
 from flask_wtf import FlaskForm
-from wtforms.validators import ValidationError
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Email, EqualTo, Length, Regexp
+from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp, NumberRange
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, IntegerField
 
 # Local modules
 from app.models import User
@@ -34,6 +33,8 @@ class RegistrationForm(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ],
                                      render_kw={'placeholder': 'Confirm your password'})
+    role = SelectField('Are you a', choices=[('volunteer', 'Volunteer'), ('volunteering organization', 'Volunteering Organization'),
+                                             ('admin', 'Admin')], validators=[DataRequired()])
     submit = SubmitField('Register')
 
     def validate_email(self, email):
@@ -44,3 +45,15 @@ class RegistrationForm(FlaskForm):
     def validate_password(self, password):
         if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
             raise ValidationError('Password must contain at least one letter and one digit.')
+
+class EditProfileForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    email = StringField('Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Save Changes')
+
+
+class AddHoursForm(FlaskForm):
+    email = StringField('User Email', validators=[DataRequired(), Email()])
+    hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, message="Hours must be greater than 0")])
+    submit = SubmitField('Add Hours')
+
