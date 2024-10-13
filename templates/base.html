@@ -32,7 +32,7 @@
             <a class="nav-link" href="{{ url_for('routes.login') }}">Login</a>
         </li>
     {% else %}
-        {% if current_user.role != 'volunteering organization' %}
+        {% if current_user.role == 'volunteer' %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('routes.rewards') }}">My Rewards</a>
             </li>
@@ -45,8 +45,16 @@
                 <a class="nav-link" href="{{ url_for('routes.add_hours') }}">Add Hours</a>
             </li>
         {% endif %}
+        {% if current_user.role == 'admin' %}
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('routes.remove_user') }}">Admin - Remove User</a>
+            <li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{ url_for('routes.view_database') }}">Admin - View Database</a>
+            <li>
+        {% endif %}
         <li class="nav-item">
-            <a class="nav-link" href="{{ url_for('routes.logout') }}">Logout</a>
+                <a class="nav-link" href="{{ url_for('routes.logout') }}">Logout</a>
         </li>
     {% endif %}
 </ul>

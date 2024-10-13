@@ -148,6 +148,46 @@ def add_hours():
     return render_template('add_hours.html', form=form)
 
 
+@routes_bp.route("/remove_user", methods=['GET', 'POST'])
+@login_required
+def remove_user():
+    if current_user.role != 'admin':
+        flash('You do not have permission to remove users.', 'danger')
+        return redirect(url_for('routes.home'))
+
+    form = RemoveUserForm()
+
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).one_or_none()
+
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            flash(f'User {user.name} has been removed from the system.', 'success')
+        else:
+            flash('User not found.', 'danger')
+
+        return redirect(url_for('routes.remove_user'))
+
+    return render_template('remove_user.html', form=form)
+
+@routes_bp.route("/view_database", methods=['GET', 'POST'])
+@login_required
+def view_database():
+    if current_user.role != 'admin':
+        flash('You do not have permission to view the database.', 'danger')
+        return redirect(url_for('routes.home'))
+
+    # Fetch all users or filter by email if a search is submitted
+    if request.method == 'POST':
+        search_email = request.form.get('search_email')
+        users = User.query.filter(User.email.contains(search_email)).all()
+    else:
+        users = User.query.all()
+
+    return render_template('view_database.html', users=users)
+
+
 
 
 

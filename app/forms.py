@@ -57,3 +57,6 @@ class AddHoursForm(FlaskForm):
     hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, message="Hours must be greater than 0")])
     submit = SubmitField('Add Hours')
 
+class RemoveUserForm(FlaskForm):
+    email = StringField('User Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Remove User')
