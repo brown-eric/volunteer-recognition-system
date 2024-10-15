@@ -14,13 +14,13 @@ routes_bp = Blueprint('routes', __name__, url_prefix="/")
 def load_user(user_id):
     return User.query.filter_by(id=user_id).one_or_none()
 
-# Directs to home page
+
 @routes_bp.route("/")
 @login_required
 def home():
     return render_template('index.html')
 
-# Login function
+
 @routes_bp.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -43,7 +43,7 @@ def login():
 
     return render_template('auth/login.html', form=form)
 
-# Register function
+
 @routes_bp.route("/register", methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -71,15 +71,12 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-# Directs to user profile page
-# Help from https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-vi-profile-page-and-avatars
 @routes_bp.route("/user/<name>")
 @login_required
 def user_profile(name):
     user = User.query.filter_by(name=name).one_or_none()
     return render_template('user.html', user=user)
 
-# Logout function
 @routes_bp.route("/logout", methods=['GET', 'POST'])
 @login_required
 def logout():

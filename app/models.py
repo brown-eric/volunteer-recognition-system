@@ -14,6 +14,8 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    hours_volunteered = db.Column(db.Integer, default=0)
+    role = db.Column(db.String(80), nullable=False, default='volunteer')
 
     def __repr__(self):
         return f'<User {self.name}>'

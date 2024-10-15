@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}My Rewards{% endblock %}
+
+{% block content %}
+    <h2>My Rewards</h2>
+
+    <ul class="list-group">
+        {% for reward in rewards %}
+            <li class="list-group-item">
+                <strong>{{ reward.name }}</strong>: {{ reward.description }}
+            </li>
+        {% else %}
+            <p>No rewards yet. Keep volunteering!</p>
+        {% endfor %}
+    </ul>
+{% endblock %}

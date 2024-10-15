@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Volunteer Hours{% endblock %}
+
+{% block content %}
+    <h2>Add Volunteer Hours</h2>
+
+    <form action="{{ url_for('routes.add_hours') }}" method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            {{ form.email.label }}
+            {{ form.email(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.hours.label }}
+            {{ form.hours(class="form-control") }}
+        </div>
+
+        <div class="form-group">
+            {{ form.submit(class="btn btn-primary") }}
+        </div>
+    </form>
+{% endblock %}
