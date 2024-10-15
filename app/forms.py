@@ -1,3 +1,4 @@
+
 # Flask modules
 from flask_wtf import FlaskForm
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp, NumberRange
@@ -33,10 +34,12 @@ class RegistrationForm(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ],
                                      render_kw={'placeholder': 'Confirm your password'})
+    # VULN: No controls to prevent any user from registering as an org or admin
     role = SelectField('Are you a', choices=[('volunteer', 'Volunteer'), ('volunteering organization', 'Volunteering Organization'),
                                              ('admin', 'Admin')], validators=[DataRequired()])
     submit = SubmitField('Register')
 
+    # CHECK: Are these functions being called?
     def validate_email(self, email):
         existing_user = User.query.filter_by(email=email.data).one_or_none()
         if existing_user:
@@ -47,8 +50,15 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Password must contain at least one letter and one digit.')
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    name = StringField('Name', validators=[
+        DataRequired(),
+        Length(min=2, max=80),
+        Regexp(r'^[a-zA-Z0-9_]+$', message='Name must contain only letters, numbers, and underscores.')],
+                       render_kw={'placeholder': 'Display name'})
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email()
+    ], render_kw={'placeholder': 'example@email.com'})
     submit = SubmitField('Save Changes')
 
 

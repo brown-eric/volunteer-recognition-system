@@ -31,8 +31,9 @@ def edit_profile():
     form = EditProfileForm()
 
     if form.validate_on_submit():
-        current_user.name = form.name.data
-        current_user.email = form.email.data
+        # Do not change data if field is left empty. Need to test this
+        if form.name.data: current_user.name = form.name.data
+        if form.email.data: current_user.email = form.email.data
         db.session.commit()
         flash('Your profile has been updated!', 'success')
         return redirect(url_for('routes.user_profile', name=current_user.name))
