@@ -1,17 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}
-Profile
-{% endblock title %}
+{% block title %}Profile - {{ user.name }}{% endblock %}
 
 {% block content %}
-    <p>Name: {{ user.name }}</p>
-    <p>Email: {{ user.email }}</p>
-    {% if current_user.role == 'volunteer' %}
-        <p><strong>Volunteer Hours:</strong> {{ user.hours_volunteered }} hours</p>
-    {% endif %}
-    <p><strong>Role:</strong> {{ user.role }}</p>
-    <a href="{{ url_for('routes.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
 
-    <!-- Change password? -->
-{% endblock content %}
+    <h2>Profile for {{ user.name }}</h2>
+    <p><strong>Name:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Role:</strong> {{ user.role }}</p>
+    {% if current_user.role == 'volunteer' %} {# This means admins and volunteering orgs can add hours #}
+    <p><strong>Hours Volunteered:</strong> {{ user.hours_volunteered }}</p>
+    {% endif %}
+    <a href="{{ url_for('routes.edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+    {% if current_user.role == 'volunteer' %} {# This means admins and volunteering orgs can add hours #}
+        <h3>Hours Added By Others:</h3>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Hours Added</th>
+                    <th>Added By</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in hours_logs %}
+                    <tr>
+                        <td>{{ log.hours_added }}</td>
+                        <td>{{ log.added_by }}</td>
+                        <td>{{ log.timestamp.strftime('%Y-%m-%d') }}</td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="3">No hours have been added yet.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endblock %}

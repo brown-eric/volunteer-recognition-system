@@ -9,7 +9,7 @@
     <title>{% block title %}{% endblock title %}</title>
 </head>
 <body>
-{% with messages = get_flashed_messages(with_categories=true, category_filter=["success", "info"]) %}
+{% with messages = get_flashed_messages(with_categories=true, category_filter=["success", "info", "danger"]) %}
 {% if messages %}
 {% for category, message in messages %}
 <div class="alert alert-{{ category }}" style="width: 100%; z-index: 999">
@@ -37,14 +37,17 @@
                 <a class="nav-link" href="{{ url_for('routes.rewards') }}">My Rewards</a>
             </li>
         {% endif %}
+
         <li class="nav-item">
             <a class="nav-link" href="{{ url_for('routes.user_profile', name=current_user.name) }}">Profile</a>
         </li>
-        {% if current_user.role == 'volunteering organization' %}
+
+        {% if current_user.role != 'volunteer' %} {# This means admins and volunteering orgs can add hours #}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('routes.add_hours') }}">Add Hours</a>
             </li>
         {% endif %}
+
         {% if current_user.role == 'admin' %}
             <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('routes.remove_user') }}">Admin - Remove User</a>
@@ -53,6 +56,7 @@
                 <a class="nav-link" href="{{ url_for('routes.view_database') }}">Admin - View Database</a>
             <li>
         {% endif %}
+
         <li class="nav-item">
                 <a class="nav-link" href="{{ url_for('routes.logout') }}">Logout</a>
         </li>
