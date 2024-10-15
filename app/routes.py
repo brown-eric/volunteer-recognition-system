@@ -1,12 +1,15 @@
 # Flask modules
-from flask import Blueprint, redirect, url_for, render_template, flash
+from flask import Blueprint, redirect, url_for, render_template, flash, abort
 from flask_login import login_user, logout_user, current_user, login_required
+from functools import wraps
+from flask_mail import Message
+
 
 # Local modules
 from app.models import User
 from app.extensions import db, bcrypt, login_manager
 from app.forms import LoginForm, RegistrationForm
-
+from app.extensions import mail
 routes_bp = Blueprint('routes', __name__, url_prefix="/")
 
 
@@ -82,3 +85,25 @@ def user_profile(name):
 def logout():
     logout_user()
     return redirect(url_for("routes.login"))
+
+#role restricted route decorator
+def role_required(role):
+    def wrapper(fn):
+        @wraps(fn)
+        def decorated_view(*args, **kwargs):
+            if not current_user.is_authenticated or not current_user.has_role(role):
+                abort(403)  # Forbidden if not role
+            return fn(*args, **kwargs)
+        return decorated_view
+    return wrapper
+
+#skeleton for admin dashboard
+@routes_bp.route("/admin")
+@role_required("admin")
+def admin_dashboard():
+    return "Admin Dashboard"
+
+def send_email(subject, recipient, body):
+    msg = Message(subject, recipients=[recipient])
+    msg.body = body
+    mail.send(msg)

@@ -1,6 +1,8 @@
 # Flask modules
 from flask import Flask
+from flask_mail import Mail
 
+mail = Mail()
 
 def create_app(debug: bool = False) -> Flask:
     # Initialize app
@@ -11,6 +13,12 @@ def create_app(debug: bool = False) -> Flask:
     app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE"
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
 
+    #config email notis
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # or another mail server
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
+    app.config['MAIL_PASSWORD'] = 'your-password'
     # Initialize extensions
     from app.extensions import db, bcrypt, csrf, login_manager
     db.init_app(app)
