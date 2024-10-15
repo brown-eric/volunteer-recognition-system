@@ -1,3 +1,4 @@
+
 # Flask modules
 from flask_wtf import FlaskForm
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp, NumberRange
@@ -22,7 +23,7 @@ class RegistrationForm(FlaskForm):
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
         DataRequired(),
-        Email("Must be a valid email address.")
+        Email()
     ], render_kw={'placeholder': 'example@email.com'})
     password = PasswordField('Password', validators=[
         DataRequired(),
@@ -33,24 +34,22 @@ class RegistrationForm(FlaskForm):
         EqualTo('password', message='Passwords must match')
     ],
                                      render_kw={'placeholder': 'Confirm your password'})
+    # VULN: No controls to prevent any user from registering as an org or admin
     role = SelectField('Are you a', choices=[('volunteer', 'Volunteer'), ('volunteering organization', 'Volunteering Organization'),
                                              ('admin', 'Admin')], validators=[DataRequired()])
     submit = SubmitField('Register')
 
-    # Prevents duplicate accounts
+    # CHECK: Are these functions being called?
     def validate_email(self, email):
         existing_user = User.query.filter_by(email=email.data).one_or_none()
         if existing_user:
             raise ValidationError('Email address already registered.')
 
     def validate_password(self, password):
-        # Consider adding special character requirements
         if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
             raise ValidationError('Password must contain at least one letter and one digit.')
 
-class ProfileForm(FlaskForm):
-    # https://wtforms.readthedocs.io/en/3.1.x/validators/#built-in-validators
-    # TODO: Work with validators to see how to work with required / non-required input
+class EditProfileForm(FlaskForm):
     name = StringField('Name', validators=[
         DataRequired(),
         Length(min=2, max=80),
@@ -58,26 +57,8 @@ class ProfileForm(FlaskForm):
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
         DataRequired(),
-        Email("Must be a valid email address.")
+        Email()
     ], render_kw={'placeholder': 'example@email.com'})
-    # TODO: Ask about using flask-change-password instead of changing password on this page:
-    #  https://pypi.org/project/flask-change-password/
-    submit = SubmitField('Save')
-
-    # Prevents duplicate accounts
-    def validate_email(self, email):
-        existing_user = User.query.filter_by(email=email.data).one_or_none()
-        if existing_user:
-            raise ValidationError('Email address already registered.')
-
-    def validate_password(self, password):
-        # Consider adding special character requirements
-        if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
-            raise ValidationError('Password must contain at least one letter and one digit.')
-
-class EditProfileForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Save Changes')
 
 
