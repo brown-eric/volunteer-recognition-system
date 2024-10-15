@@ -46,3 +46,30 @@ class RegistrationForm(FlaskForm):
         # Consider adding special character requirements
         if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
             raise ValidationError('Password must contain at least one letter and one digit.')
+
+class ProfileForm(FlaskForm):
+    # https://wtforms.readthedocs.io/en/3.1.x/validators/#built-in-validators
+    # TODO: Work with validators to see how to work with required / non-required input
+    name = StringField('Name', validators=[
+        DataRequired(),
+        Length(min=2, max=80),
+        Regexp(r'^[a-zA-Z0-9_]+$', message='Name must contain only letters, numbers, and underscores.')],
+                       render_kw={'placeholder': 'Display name'})
+    email = StringField('Email', validators=[
+        DataRequired(),
+        Email("Must be a valid email address.")
+    ], render_kw={'placeholder': 'example@email.com'})
+    # TODO: Ask about using flask-change-password instead of changing password on this page:
+    #  https://pypi.org/project/flask-change-password/
+    submit = SubmitField('Save')
+
+    # Prevents duplicate accounts
+    def validate_email(self, email):
+        existing_user = User.query.filter_by(email=email.data).one_or_none()
+        if existing_user:
+            raise ValidationError('Email address already registered.')
+
+    def validate_password(self, password):
+        # Consider adding special character requirements
+        if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
+            raise ValidationError('Password must contain at least one letter and one digit.')
