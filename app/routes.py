@@ -101,7 +101,8 @@ def register():
 @login_required
 def user_profile(name):
     user = User.query.filter_by(name=name).one_or_none()
-    return render_template('user.html', user=user)
+    hours_logs = HoursLog.query.filter_by(added_to=user.email).all()
+    return render_template('user.html', user=user, hours_logs=hours_logs)
 
 @routes_bp.route("/rewards")
 @login_required
@@ -125,28 +126,46 @@ def rewards():
 
     return render_template('rewards.html', rewards=user_rewards)
 
+
 @routes_bp.route("/add_hours", methods=['GET', 'POST'])
 @login_required
 def add_hours():
-    print("What is going on")
-    if current_user.role != 'volunteering_organization':
+    if current_user.role == 'volunteer':
         flash('You do not have permission to add hours.', 'danger')
         return redirect(url_for('routes.home'))
+
     form = AddHoursForm()
+    email_invalid = False  # Flag for invalid email
 
     if form.validate_on_submit():
         # Find the user by email
-        user = User.query.filter_by(email=form.email.data).one_or_none()
+        user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            user.hours_volunteered += form.hours.data
-            db.session.commit()  # Save the updated hours to the database
-            flash(f'Successfully added {form.hours.data} hours to {user.name}.', 'success')
-            return redirect(url_for('routes.add_hours'))
-        else:
-            flash('User not found.', 'danger')
+            # Check if the user is a volunteer
+            if user.role != 'volunteer':
+                flash(f'Cannot add hours. {user.name} is not a volunteer.', 'danger')
+            else:
+                # Add hours to the user's total
+                user.hours_volunteered += form.hours.data
+                db.session.commit()  # Commit the changes to the database
 
-    return render_template('add_hours.html', form=form)
+                # Log the addition of hours
+                log_entry = HoursLog(hours_added=form.hours.data,
+                                     added_by=current_user.email,
+                                     added_to=user.email)
+                db.session.add(log_entry)
+                db.session.commit()
+
+                flash(f'Successfully added {form.hours.data} hours to {user.name}.', 'success')
+        else:
+            # Flash message and set flag for invalid email
+            flash('No user found with that email address. Please try again.', 'danger')
+            email_invalid = True
+
+        return redirect(url_for('routes.add_hours'))
+
+    return render_template('add_hours.html', form=form, email_invalid=email_invalid)
 
 
 @routes_bp.route("/remove_user", methods=['GET', 'POST'])

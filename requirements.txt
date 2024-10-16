@@ -3,4 +3,5 @@ Flask-WTF
 Flask-Login
 Flask-Bcrypt
 Flask-SQLAlchemy
+flask_migrate
 email-validator

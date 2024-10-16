@@ -5,7 +5,7 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Le
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, IntegerField
 
 # Local modules
-from app.models import User
+from app.models import User, HoursLog
 
 
 class LoginForm(FlaskForm):
