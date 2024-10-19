@@ -2,6 +2,7 @@ import unittest
 from app.models import User
 from app.extensions import bcrypt
 
+# from https://testdriven.io/blog/flask-pytest/
 def test_new_user():
     """
     GIVEN a User model
