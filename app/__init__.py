@@ -9,7 +9,7 @@ def create_app(debug: bool = False) -> Flask:
 
     # Setup app configs
     app.config['DEBUG'] = debug
-    app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE"
+    app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE" # add something here?
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
