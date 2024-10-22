@@ -1,8 +1,7 @@
 # Flask modules
 from flask import Flask
-from flask_mail import Mail
+from flask_migrate import Migrate
 
-mail = Mail()
 
 def create_app(debug: bool = False) -> Flask:
     # Initialize app
@@ -10,21 +9,19 @@ def create_app(debug: bool = False) -> Flask:
 
     # Setup app configs
     app.config['DEBUG'] = debug
-    app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE"
+    app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE" # add something here?
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-    #config email notis
-    app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # or another mail server
-    app.config['MAIL_PORT'] = 587
-    app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
-    app.config['MAIL_PASSWORD'] = 'your-password'
+
+
     # Initialize extensions
     from app.extensions import db, bcrypt, csrf, login_manager
     db.init_app(app)
     csrf.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)
+    migrate = Migrate(app, db)
 
     # Create database tables
     from app import models

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}View Database{% endblock %}
+
+{% block content %}
+    <h2>Database Overview</h2>
+
+    <form method="POST" action="{{ url_for('routes.view_database') }}">
+        <div class="form-group">
+            <label for="search_email">Search by Email:</label>
+            <input type="text" name="search_email" id="search_email" class="form-control" placeholder="Enter email to search">
+        </div>
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    <br>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Hours Volunteered</th>
+                <th>Date Created</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.id }}</td>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.role }}</td>
+                    <td>{{ user.hours_volunteered }}</td>
+                    <td>{{ user.created_date.strftime('%Y-%m-%d') }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6">No users found in the database.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

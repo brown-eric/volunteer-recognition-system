@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block title %}Information Page{% endblock %}
+
+{% block content %}
+    <main class="p-2">
+        <header>
+            <h1>Welcome to the Volunteer Reward and Recognition System</h1>
+            <img src="{{ url_for('static', filename='images/group.png') }}" alt="Group Image">
+{#            <nav>#}
+{#                <ul>#}
+{#                    <li><a href="{{ url_for('routes.home') }}">Home</a></li>#}
+{#                    {% if current_user.is_anonymous %}#}
+{#                        <li><a href="{{ url_for('routes.login') }}">Login</a></li>#}
+{#                    {% else %}#}
+{#                        <li><a href="{{ url_for('routes.user_profile', name=current_user.name) }}">Profile</a></li>#}
+{#                        <li><a href="{{ url_for('routes.rewards') }}">My Rewards</a></li>#}
+{#                        <li><a href="{{ url_for('routes.logout') }}">Logout</a></li>#}
+{#                    {% endif %}#}
+{#                </ul>#}
+{#            </nav>#}
+        </header>
+
+        <section class="intro">
+            <h2>Track your volunteer hours and get rewarded!</h2>
+            <p>Join our volunteer recognition system and get recognized for your contributions to UF student organizations.</p>
+        </section>
+
+        <section class="features">
+            <h2>Features</h2>
+            <ul>
+                <li>Track volunteer hours</li>
+                <li>Earn rewards and badges</li>
+                <li>View progress and leaderboards</li>
+                <li>Claim rewards for your hard work</li>
+            </ul>
+        </section>
+    </main>
+{% endblock content %}
