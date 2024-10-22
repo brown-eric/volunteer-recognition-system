@@ -152,7 +152,8 @@ def add_hours():
 
                 # Log the addition of hours
                 log_entry = HoursLog(hours_added=form.hours.data,
-                                     added_by=current_user.email,
+                                     added_by_email=current_user.email,
+                                     added_by_username=current_user.name,
                                      added_to=user.email)
                 db.session.add(log_entry)
                 db.session.commit()
