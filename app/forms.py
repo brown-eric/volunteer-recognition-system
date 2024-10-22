@@ -6,6 +6,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 
 # Local modules
 from app.models import User, HoursLog
+from app.email import send_registration_email
 
 
 class LoginForm(FlaskForm):
@@ -70,3 +71,4 @@ class AddHoursForm(FlaskForm):
 class RemoveUserForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Remove User')
+
