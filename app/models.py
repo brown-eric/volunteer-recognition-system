@@ -10,7 +10,8 @@ from app.extensions import db
 class HoursLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     hours_added = db.Column(db.Integer, nullable=False)
-    added_by = db.Column(db.String(255), nullable=False)  # The name or email of the volunteering organization who added the hours
+    added_by_email = db.Column(db.String(255), nullable=False) # The email of the volunteering organization who added the hours
+    added_by_username = db.Column(db.String(80), nullable=False)  # The username of the volunteering organization who added the hours
     added_to = db.Column(db.String(255), nullable=False)  # The email of the user who received the hours
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # When the hours were added
 

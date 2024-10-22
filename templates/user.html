@@ -18,7 +18,8 @@
             <thead>
                 <tr>
                     <th>Hours Added</th>
-                    <th>Added By</th>
+                    <th>Added By (Email)</th>
+                    <th>Added By (Username)</th>
                     <th>Date</th>
                 </tr>
             </thead>
@@ -26,12 +27,14 @@
                 {% for log in hours_logs %}
                     <tr>
                         <td>{{ log.hours_added }}</td>
-                        <td>{{ log.added_by }}</td>
+                        {# switch to added_by_email and added_by_username? #}
+                        <td>{{ log.added_by_email }}</td>
+                        <td>{{ log.added_by_username }}</td>
                         <td>{{ log.timestamp.strftime('%Y-%m-%d') }}</td>
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="3">No hours have been added yet.</td>
+                        <td colspan="4">No hours have been added yet.</td>
                     </tr>
                 {% endfor %}
             </tbody>
