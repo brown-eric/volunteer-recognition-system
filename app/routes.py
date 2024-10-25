@@ -18,11 +18,11 @@ def load_user(user_id):
 @routes_bp.route("/")
 @login_required
 def home():
-    return render_template('index.html')
+    return render_template('index.html', active_tab='home')
 
 @routes_bp.route("/information")
 def info():
-    return render_template('home.html')
+    return render_template('home.html', active_tab='info')
 
 
 @routes_bp.route("/edit_profile", methods=['GET', 'POST'])
@@ -42,7 +42,7 @@ def edit_profile():
     form.name.data = current_user.name
     form.email.data = current_user.email
 
-    return render_template('edit_profile.html', form=form)
+    return render_template('edit_profile.html', form=form, active_tab='profile')
 
 
 
@@ -66,7 +66,7 @@ def login():
         else:
             flash("Invalid email or password", 'danger')
 
-    return render_template('auth/login.html', form=form)
+    return render_template('auth/login.html', form=form, active_tab='login')
 
 
 @routes_bp.route("/register", methods=['GET', 'POST'])
@@ -102,7 +102,7 @@ def register():
 def user_profile(name):
     user = User.query.filter_by(name=name).one_or_none()
     hours_logs = HoursLog.query.filter_by(added_to=user.email).all()
-    return render_template('user.html', user=user, hours_logs=hours_logs)
+    return render_template('user.html', user=user, hours_logs=hours_logs, active_tab='profile')
 
 @routes_bp.route("/rewards")
 @login_required
@@ -124,7 +124,7 @@ def rewards():
     if user.hours_volunteered >= 10:
         user_rewards.append(rewards[0])  # Bronze Badge
 
-    return render_template('rewards.html', rewards=user_rewards)
+    return render_template('rewards.html', rewards=user_rewards, active_tab='rewards')
 
 
 @routes_bp.route("/add_hours", methods=['GET', 'POST'])
@@ -152,7 +152,8 @@ def add_hours():
 
                 # Log the addition of hours
                 log_entry = HoursLog(hours_added=form.hours.data,
-                                     added_by=current_user.email,
+                                     added_by_email=current_user.email,
+                                     added_by_username=current_user.name,
                                      added_to=user.email)
                 db.session.add(log_entry)
                 db.session.commit()
@@ -165,7 +166,7 @@ def add_hours():
 
         return redirect(url_for('routes.add_hours'))
 
-    return render_template('add_hours.html', form=form, email_invalid=email_invalid)
+    return render_template('add_hours.html', form=form, email_invalid=email_invalid, active_tab='add-hours')
 
 
 @routes_bp.route("/remove_user", methods=['GET', 'POST'])
@@ -189,7 +190,7 @@ def remove_user():
 
         return redirect(url_for('routes.remove_user'))
 
-    return render_template('remove_user.html', form=form)
+    return render_template('remove_user.html', form=form, active_tab='remove-user')
 
 @routes_bp.route("/view_database", methods=['GET', 'POST'])
 @login_required
@@ -205,7 +206,7 @@ def view_database():
     else:
         users = User.query.all()
 
-    return render_template('view_database.html', users=users)
+    return render_template('view_database.html', users=users, active_tab='database')
 
 
 
