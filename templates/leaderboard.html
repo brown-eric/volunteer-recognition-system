@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Leaderboard{% endblock %}
+
+{% block content %}
+    <h2>Volunteer Leaderboard</h2>
+    <p>See the top volunteers by total hours contributed!</p>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Rank</th>
+                <th>Name</th>
+                <th>Volunteer Hours</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for volunteer in volunteers %}
+                <tr>
+                    <td>{{ loop.index }}</td>
+                    <td>{{ volunteer.name }}</td>
+                    <td>{{ volunteer.hours_volunteered }}</td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="3">No volunteers found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
