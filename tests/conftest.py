@@ -3,6 +3,7 @@ import pytest_flask
 import pytest
 from app import create_app
 from app.models import db
+from app.models import User
 
 # from https://pytest-with-eric.com/api-testing/pytest-flask-postgresql-testing/#Use-an-in-memory-database-SQLite
 @pytest.fixture(scope="session")

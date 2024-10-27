@@ -1,8 +1,10 @@
+from app.models import User
+from app.extensions import bcrypt
 
 # from https://testdriven.io/blog/flask-pytest/
-def test_required_login_pages(test_client):
+def test_nologin_redirects(test_client):
     """
-    GIVEN a Flask application configured for testing
+    GIVEN a Flask application configured for testing and a user is not logged in
     WHEN any page requiring a user to be logged in is requested (GET)
     THEN check that the response redirects to the login page.
     """
@@ -25,8 +27,8 @@ def test_required_login_pages(test_client):
 def test_registration_form(test_client):
     """
     GIVEN a Flask application configured for testing
-    WHEN the registration page is requested (GET)
-    THEN check that the response redirects to the login page.
+    WHEN the /register page is requested (GET)
+    THEN check that the response is given and the registration form is given.
     """
     response = test_client.get('/register')
     assert response.status_code == 200
@@ -40,6 +42,11 @@ def test_registration_form(test_client):
     assert 'name="submit"' in html
 
 def test_login_form(test_client):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN the /login page is requested (GET)
+    THEN check that the response is given and the login form is given.
+    """
     response = test_client.get('/login')
     assert response.status_code == 200
     html = response.get_data(as_text=True)
@@ -47,14 +54,20 @@ def test_login_form(test_client):
     assert 'name="password"' in html
     assert 'name="submit"' in html
 
-# TODO: Fix this case
+# TODO: NEED HELP
 def test_register_user(test_client):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN a user correctly fills out registration form (POST)
+    THEN check that the form submission is successful and redirects to the home page.
+        """
     response = test_client.post('/register', data={
-        'username': 'alice',
+        'name': 'alice',
         'email': 'alice@example.com',
         'password': 'foo',
         'confirm_password': 'foo',
-        'role': 'admin', # not a field, select from dropdown
+        'role': 'Admin' # How to input this since this is a select, not a field
+        # Also the above return 400, should we write an exception for this?
         },
         follow_redirects=True)
     assert response.status_code == 200
@@ -68,5 +81,20 @@ def test_register_user(test_client):
         # assert response.status_code == 200
         # html = response.get_data(as_text=True)
         # assert 'Hi, alice!' in html
-# TODO: Test fields in edit profile form. How to do this when login required?
-# TODO: Test that logged in users redirect when accessing /register, /login
+
+# NEED HELP. Sends 400 error
+def test_login_redirects(test_client):
+    """
+    GIVEN a Flask application configured for testing
+    WHEN a user correctly fills out registration form (POST)
+    THEN check that the form submission is successful and redirects to the home page.
+    """
+    User(name='alice',email='alice@example.com',password="foo")
+    response = test_client.post('/login', data=dict(email='alice@example.com',password="foo"),follow_redirects=True
+        )
+    assert response.status_code == 200
+    assert response.request.path == '/'
+    response = test_client.get('/login')
+    assert response.status_code == 302
+    response = test_client.get('/register')
+    assert response.status_code == 302
