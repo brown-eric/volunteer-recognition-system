@@ -6,6 +6,7 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 
 # Local modules
 from app.models import User, HoursLog
+from app.email import send_registration_email
 
 
 class LoginForm(FlaskForm):
@@ -16,10 +17,10 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
-    name = StringField('Name', validators=[
+    name = StringField('Username', validators=[
         DataRequired(),
         Length(min=2, max=80),
-        Regexp(r'^[a-zA-Z0-9_]+$', message='Name must contain only letters, numbers, and underscores.')],
+        Regexp(r'^[a-zA-Z0-9_]+$', message='Username must contain only letters, numbers, and underscores.')],
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
         DataRequired(),
@@ -50,10 +51,10 @@ class RegistrationForm(FlaskForm):
             raise ValidationError('Password must contain at least one letter and one digit.')
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Name', validators=[
+    name = StringField('Username', validators=[
         DataRequired(),
         Length(min=2, max=80),
-        Regexp(r'^[a-zA-Z0-9_]+$', message='Name must contain only letters, numbers, and underscores.')],
+        Regexp(r'^[a-zA-Z0-9_]+$', message='Username must contain only letters, numbers, and underscores.')],
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
         DataRequired(),
@@ -70,3 +71,4 @@ class AddHoursForm(FlaskForm):
 class RemoveUserForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Remove User')
+

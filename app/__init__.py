@@ -1,6 +1,7 @@
 # Flask modules
 from flask import Flask
 from flask_migrate import Migrate
+from flask_mail import Mail
 
 
 def create_app(debug: bool = False) -> Flask:
@@ -12,8 +13,13 @@ def create_app(debug: bool = False) -> Flask:
     app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE" # add something here?
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-
-
+    app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Replace with your SMTP server
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USE_SSL'] = False
+    app.config['MAIL_USERNAME'] = 'VolunteerConnect2024@gmail.com'  # Replace with your email
+    app.config['MAIL_PASSWORD'] = 'exhqpnxdzddeqswh'  # Replace with your email password
+    app.config['MAIL_DEFAULT_SENDER'] = 'VolunteerConnect2024@gmail.com'
 
     # Initialize extensions
     from app.extensions import db, bcrypt, csrf, login_manager
@@ -32,4 +38,8 @@ def create_app(debug: bool = False) -> Flask:
     from app.routes import routes_bp
     app.register_blueprint(routes_bp)
 
+
+    #email
+    from app.extensions import mail
+    mail.init_app(app)
     return app
