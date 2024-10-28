@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Events{% endblock %}
+
+{% block content %}
+    <h2>Available Events</h2>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.description }}</td>
+                    <td>{{ event.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if current_user in event.attendees %}
+                            Already signed up
+                        {% else %}
+                            <a href="{{ url_for('routes.signup_event', event_id=event.id) }}" class="btn btn-primary">Sign Up</a>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">No events available at the moment.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
