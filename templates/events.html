@@ -3,8 +3,11 @@
 {% block title %}Events{% endblock %}
 
 {% block content %}
-    <h2>Available Events</h2>
 
+<h2>Events</h2>
+
+{% if current_user.role == 'volunteer' %}
+    <h3>Available Events to Sign Up</h3>
     <table class="table table-striped">
         <thead>
             <tr>
@@ -35,4 +38,43 @@
             {% endfor %}
         </tbody>
     </table>
+
+{% elif current_user.role == 'volunteering organization' %}
+    <h3>Events Created by {{ current_user.name }}</h3>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Date</th>
+                <th>Attendees</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in events %}
+                <tr>
+                    <td>{{ event.title }}</td>
+                    <td>{{ event.description }}</td>
+                    <td>{{ event.date.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>
+                        {% if event.attendees %}
+                            <ul>
+                                {% for attendee in event.attendees %}
+                                    <li>{{ attendee.name }} ({{ attendee.email }})</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            No attendees yet.
+                        {% endif %}
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4">No events created yet.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
 {% endblock %}
