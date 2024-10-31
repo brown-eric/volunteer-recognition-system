@@ -27,6 +27,12 @@
     <li class="nav-item">
         <a class="nav-link {% if active_tab == 'info' %}active{% endif %}" href="{{ url_for('routes.info') }}">Information</a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'leaderboard' %}active{% endif %}" href="{{ url_for('routes.leaderboard') }}">Leaderboard</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link {% if active_tab == 'events' %}active{% endif %}" href="{{ url_for('routes.events') }}">Events</a>
+    </li>
     {% if current_user.is_anonymous %}
         <li class="nav-item">
             <a class="nav-link {% if active_tab == 'login' %}active{% endif %}" href="{{ url_for('routes.login') }}">Login</a>
@@ -45,6 +51,12 @@
         {% if current_user.role != 'volunteer' %} {# This means admins and volunteering orgs can add hours #}
             <li class="nav-item">
                 <a class="nav-link {% if active_tab == 'add-hours' %}active{% endif %}" href="{{ url_for('routes.add_hours') }}">Add Hours</a>
+            </li>
+        {% endif %}
+
+        {% if current_user.role == 'volunteering organization' %}
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'create-event' %}active{% endif %}" href="{{ url_for('routes.create_event') }}">Create Event</a>
             </li>
         {% endif %}
 

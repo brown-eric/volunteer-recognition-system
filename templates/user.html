@@ -39,5 +39,28 @@
                 {% endfor %}
             </tbody>
         </table>
+<h3>Events Signed Up For:</h3>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Event Title</th>
+            <th>Date</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in user.events %}
+            <tr>
+                <td>{{ event.title }}</td>
+                <td>{{ event.date.strftime('%Y-%m-%d') }}</td>
+                <td>{{ event.description }}</td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">No events signed up for yet.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
     {% endif %}
 {% endblock %}

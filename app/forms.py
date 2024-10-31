@@ -2,10 +2,10 @@
 # Flask modules
 from flask_wtf import FlaskForm
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp, NumberRange
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, IntegerField
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, IntegerField, TextAreaField, DateTimeField
 
 # Local modules
-from app.models import User, HoursLog
+from app.models import User, HoursLog, Event
 from app.email import send_registration_email
 
 
@@ -72,3 +72,8 @@ class RemoveUserForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email()])
     submit = SubmitField('Remove User')
 
+class CreateEventForm(FlaskForm):
+    title = StringField('Event Title', validators=[DataRequired()])
+    description = TextAreaField('Description', validators=[DataRequired()])
+    date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired()], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
+    submit = SubmitField('Create Event')

@@ -3,7 +3,6 @@ from flask import Blueprint, redirect, url_for, render_template, flash, request
 from flask_login import login_user, logout_user, current_user, login_required
 
 # Local modules
-from app.models import User
 from app.extensions import db, bcrypt, login_manager
 from app.forms import *
 
@@ -107,6 +106,13 @@ def user_profile(name):
     hours_logs = HoursLog.query.filter_by(added_to=user.email).all()
     return render_template('user.html', user=user, hours_logs=hours_logs, active_tab='profile')
 
+@routes_bp.route("/leaderboard")
+@login_required
+def leaderboard():
+    # Retrieve all volunteers ordered by hours in descending order
+    volunteers = User.query.filter_by(role='volunteer').order_by(User.hours_volunteered.desc()).all()
+    return render_template('leaderboard.html', volunteers=volunteers)
+
 @routes_bp.route("/rewards")
 @login_required
 def rewards():
@@ -202,7 +208,7 @@ def view_database():
         flash('You do not have permission to view the database.', 'danger')
         return redirect(url_for('routes.home'))
 
-    # Fetch all users or filter by email if a search is submitted
+    # get all users or filter by email if a search is submitted
     if request.method == 'POST':
         search_email = request.form.get('search_email')
         users = User.query.filter(User.email.contains(search_email)).all()
@@ -211,6 +217,53 @@ def view_database():
 
     return render_template('view_database.html', users=users, active_tab='database')
 
+@routes_bp.route("/create_event", methods=['GET', 'POST'])
+@login_required
+def create_event():
+    if current_user.role != 'volunteering organization':
+        flash('Only volunteer organizations can create events.', 'danger')
+        return redirect(url_for('routes.home'))
+
+    form = CreateEventForm()
+
+    if form.validate_on_submit():
+        new_event = Event(
+            title=form.title.data,
+            description=form.description.data,
+            date=form.date.data,
+            created_by=current_user.name  # do i want email or name?
+        )
+        db.session.add(new_event)
+        db.session.commit()
+        flash('Event created successfully!', 'success')
+        return redirect(url_for('routes.create_event'))
+
+    return render_template('create_event.html', form=form)
+
+@routes_bp.route("/events")
+@login_required
+def events():
+    # Fetch all events from the database
+    events = Event.query.order_by(Event.date).all()
+    return render_template('events.html', events=events)
+
+@routes_bp.route("/signup_event/<int:event_id>")
+@login_required
+def signup_event(event_id):
+    event = Event.query.get(event_id)
+
+    if current_user.role != 'volunteer':
+        flash('Only volunteers can sign up for events.', 'danger')
+        return redirect(url_for('routes.events'))
+
+    if event:
+        event.attendees.append(current_user)
+        db.session.commit()
+        flash('Successfully signed up for the event!', 'success')
+    else:
+        flash('Event not found.', 'danger')
+
+    return redirect(url_for('routes.events'))
 
 
 
