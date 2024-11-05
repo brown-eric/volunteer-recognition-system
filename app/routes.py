@@ -111,7 +111,7 @@ def user_profile(name):
 def leaderboard():
     # Retrieve all volunteers ordered by hours in descending order
     volunteers = User.query.filter_by(role='volunteer').order_by(User.hours_volunteered.desc()).all()
-    return render_template('leaderboard.html', volunteers=volunteers)
+    return render_template('leaderboard.html', volunteers=volunteers, active_tab='leaderboard')
 
 @routes_bp.route("/rewards")
 @login_required
@@ -238,14 +238,14 @@ def create_event():
         flash('Event created successfully!', 'success')
         return redirect(url_for('routes.create_event'))
 
-    return render_template('create_event.html', form=form)
+    return render_template('create_event.html', form=form, active_tab='create-event')
 
 @routes_bp.route("/events")
 @login_required
 def events():
     # Fetch all events from the database
     events = Event.query.order_by(Event.date).all()
-    return render_template('events.html', events=events)
+    return render_template('events.html', events=events, active_tab='events')
 
 @routes_bp.route("/signup_event/<int:event_id>")
 @login_required

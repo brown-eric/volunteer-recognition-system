@@ -48,6 +48,8 @@
             <a class="nav-link {% if active_tab == 'profile' %}active{% endif %}" href="{{ url_for('routes.user_profile', name=current_user.name) }}">Profile</a>
         </li>
 
+
+
         {% if current_user.role != 'volunteer' %} {# This means admins and volunteering orgs can add hours #}
             <li class="nav-item">
                 <a class="nav-link {% if active_tab == 'add-hours' %}active{% endif %}" href="{{ url_for('routes.add_hours') }}">Add Hours</a>
