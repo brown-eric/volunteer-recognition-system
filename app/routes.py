@@ -88,7 +88,7 @@ def register():
         db.session.add(new_user)
         db.session.commit()
 
-        #email confirmatino
+        #email confirmation
         send_registration_email(email, name)
 
         # Login user
