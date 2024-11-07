@@ -9,8 +9,8 @@ def create_app(debug: bool = False) -> Flask:
     app = Flask(__name__, template_folder='../templates', static_folder='../static', static_url_path='/')
 
     # Setup app configs
-    app.config['DEBUG'] = debug
-    app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE" # add something here?
+    app.config['DEBUG'] = True
+    app.config['SECRET_KEY'] = "YOUR-SECRET-KEY-HERE"
     app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'  # Replace with your SMTP server

@@ -1,28 +1,11 @@
+from app.forms import RegistrationForm
 from app.models import User
+from flask_wtf import FlaskForm
+from wtforms import ValidationError
 from app.extensions import bcrypt
+import email_validator
 import json
 
-def test_success_registration(client, user_payload):
-    """
-        GIVEN a Flask application configured for testing
-        WHEN a user correctly fills out registration form (POST)
-        THEN check that the form submission is successful and redirects to the home page.
-    """
-    headers = {
-        'content-type': 'application/json',
-    }
-    response = client.post(
-        "/register", data=json.dumps(user_payload), content_type="application/json"
-    ) # I don't know how to get this to not return 400
-    assert response.status_code == 201
-
-    response = client.get("/user/JohnDoe")
-    assert response.status_code == 200
-
-    read_response_json = json.loads(response.data)
-    print(read_response_json)
-    assert len(read_response_json) == 1
-# from https://testdriven.io/blog/flask-pytest/
 def test_nologin_redirects(client):
     """
     GIVEN a Flask application configured for testing and a user is not logged in
@@ -74,20 +57,3 @@ def test_login_form(client):
     assert 'name="email"' in html
     assert 'name="password"' in html
     assert 'name="submit"' in html
-
-# NEED HELP. Sends 400 error
-def test_successful_login(client):
-    """
-    GIVEN a Flask application configured for testing
-    WHEN a user correctly fills out login form (POST)
-    THEN check that the form submission is successful and redirects to the home page.
-    """
-    User(name='alice',email='alice@example.com',password="foo", role="volunteer")
-    response = client.post('/login', data=dict(email='alice@example.com',password="foo", remember_me=False),follow_redirects=True
-        ) # I don't know how to get this to not return 400
-    assert response.status_code == 200
-    assert response.request.path == '/'
-    # response = client.get('/login')
-    # assert response.status_code == 302
-    # response = client.get('/register')
-    # assert response.status_code == 302

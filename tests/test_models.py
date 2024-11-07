@@ -16,6 +16,7 @@ class TestNewUser(unittest.TestCase):
         assert user.email == 'patkennedy79@gmail.com'
         assert user.password != 'FlaskIsAwesome'
         assert user.role == 'volunteer'
+        assert user.hours_volunteered == 0 # Why does it return None instead of the default 0?
 
     def test_new_org(self):
         """
@@ -29,3 +30,5 @@ class TestNewUser(unittest.TestCase):
         assert user.email == 'patkennedy79@gmail.com'
         assert user.password != 'FlaskIsAwesome'
         assert user.role == 'organization'
+
+    # def test_new_admin(self):
