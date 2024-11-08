@@ -146,6 +146,11 @@ def add_hours():
     form = AddHoursForm()
     email_invalid = False  # Flag for invalid email
 
+    volunteer_emails = User.query.with_entities(User.email).all()
+    # Convert the query result to a list of strings
+    email_list = [email.email for email in volunteer_emails]
+
+
     if form.validate_on_submit():
         # Find the user by email
         user = User.query.filter_by(email=form.email.data).first()
@@ -175,7 +180,10 @@ def add_hours():
 
         return redirect(url_for('routes.add_hours'))
 
-    return render_template('add_hours.html', form=form, email_invalid=email_invalid, active_tab='add-hours')
+    # volunteer_emails = User.query.with_entities(User.email).all()
+    # email_list = [email.email for email in volunteer_emails if email.role == "volunteer"]
+    email_list = [volunteer.email for volunteer in current_user.volunteers if volunteer.role == 'volunteer']
+    return render_template('add_hours.html', form=form, email_invalid=email_invalid, active_tab='add-hours', email_data=email_list)
 
 
 @routes_bp.route("/remove_user", methods=['GET', 'POST'])
@@ -265,8 +273,66 @@ def signup_event(event_id):
 
     return redirect(url_for('routes.events'))
 
+@routes_bp.route("/add_member", methods=['GET', 'POST'])
+@login_required
+def add_member():
+    if current_user.role == 'volunteer':
+        flash('You do not have permission to add a member.', 'danger')
+        return redirect(url_for('routes.home'))
 
+    form = AddMemberForm()
+    email_invalid = False  # Flag for invalid email
 
+    if form.validate_on_submit():
+        # Find the user by email
+        user = User.query.filter_by(email=form.email.data).first()
+
+        if user:
+            # Check if the user is a volunteer
+            if user.role != 'volunteer':
+                flash(f'Cannot add member. {user.name} is not a volunteer.', 'danger')
+            else:
+                # Add the member
+                current_user.volunteers.append(user)
+                db.session.commit()  # Commit the changes to the database
+
+                # Log the addition of hours
+
+                flash(f'Successfully added {user.name}.', 'success')
+        else:
+            # Flash message and set flag for invalid email
+            flash('No user found with that email address. Please try again.', 'danger')
+            email_invalid = True
+
+        return redirect(url_for('routes.add_member'))
+
+    return render_template('manage_memberships.html', form=form, email_invalid=email_invalid, active_tab='manage-memberships')
+
+@routes_bp.route("/remove_member/<int:volunteer_id>", methods=['GET', 'POST'])
+@login_required
+def remove_member(volunteer_id):
+    if current_user.role != 'volunteering organization':
+        flash('You do not have permission to remove a member.', 'danger')
+        return redirect(url_for('routes.home'))
+    volunteer = User.query.filter_by(id=volunteer_id, role='volunteer').first()
+    if volunteer.role != 'volunteer':
+        flash('This user is not a volunteer.', 'danger')
+        return redirect(url_for('routes.remove_member'))
+
+    form=AddMemberForm()
+    email_invalid = False
+
+    if volunteer in current_user.volunteers:
+        # Remove the given volunteer
+        current_user.volunteers.remove(volunteer)
+        db.session.commit()
+
+        flash(f'Successfully added {volunteer.name}.', 'success')
+    else:
+        # Flash message and set flag for invalid email
+        flash('This user is not a member of your organization', 'danger')
+        return redirect(url_for('routes.remove_member'))
+    return render_template('manage_memberships.html', form=form, active_tab='manage-memberships')
 
 @routes_bp.route("/logout", methods=['GET', 'POST'])
 @login_required

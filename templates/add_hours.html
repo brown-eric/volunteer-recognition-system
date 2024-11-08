@@ -5,13 +5,17 @@
 {% block content %}
     <h2>Add Volunteer Hours</h2>
 
-    <form action="{{ url_for('routes.add_hours') }}" method="POST">
+    <form action="{{ url_for('routes.add_hours') }}" method="POST" id="add_hours">
         {{ form.hidden_tag() }}
-
-        <div class="form-group">
-            {{ form.email.label }}
-            {{ form.email(class="form-control") }}
+        <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+        <div class="autocomplete form-group">
+            <label for="email" id="add_hours_email">{{ form.email.label }}</label>
+            {{ form.email(class="form-control", id="myInput") }}
         </div>
+        <script>
+            const emails = {{email_data|tojson}}
+            autocomplete(document.getElementById("myInput"), emails);
+        </script>
 
         <div class="form-group">
             {{ form.hours.label }}
