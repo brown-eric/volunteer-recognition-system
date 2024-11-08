@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8"/>
     <link rel="stylesheet" href="/css/main.css"/>
-    <script src="/js/main.js" defer></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='images/group.png') }}" type="image/png">
     <title>{% block title %}{% endblock title %}</title>
 </head>
@@ -48,6 +48,8 @@
             <a class="nav-link {% if active_tab == 'profile' %}active{% endif %}" href="{{ url_for('routes.user_profile', name=current_user.name) }}">Profile</a>
         </li>
 
+
+
         {% if current_user.role != 'volunteer' %} {# This means admins and volunteering orgs can add hours #}
             <li class="nav-item">
                 <a class="nav-link {% if active_tab == 'add-hours' %}active{% endif %}" href="{{ url_for('routes.add_hours') }}">Add Hours</a>
@@ -57,6 +59,9 @@
         {% if current_user.role == 'volunteering organization' %}
             <li class="nav-item">
                 <a class="nav-link {% if active_tab == 'create-event' %}active{% endif %}" href="{{ url_for('routes.create_event') }}">Create Event</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'manage-memberships' %}active{% endif %}" href="{{ url_for('routes.add_member') }}">Manage Memberships</a>
             </li>
         {% endif %}
 

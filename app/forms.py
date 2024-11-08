@@ -77,3 +77,7 @@ class CreateEventForm(FlaskForm):
     description = TextAreaField('Description', validators=[DataRequired()])
     date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired()], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
     submit = SubmitField('Create Event')
+
+class AddMemberForm(FlaskForm):
+    email = StringField('User Email', validators=[DataRequired(), Email()])
+    submit = SubmitField('Add Volunteer To Your Organization')

@@ -29,6 +29,11 @@ event_attendees = db.Table('event_attendees',
     db.Column('event_id', db.Integer, db.ForeignKey('event.id'), primary_key=True)
 )
 
+volunteer_organization = db.Table('volunteer_organization',
+    db.Column('organization_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+    db.Column('volunteer_id', db.Integer, db.ForeignKey('user.id'), primary_key=True)
+)
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True, unique=True, nullable=False)
     name = db.Column(db.String(80), nullable=False)
@@ -37,7 +42,13 @@ class User(db.Model, UserMixin):
     created_date = db.Column(db.DateTime, default=datetime.utcnow)
     hours_volunteered = db.Column(db.Integer, default=0)
     role = db.Column(db.String(80), nullable=False, default='volunteer')
-
+    volunteers = db.relationship(
+        'User', secondary=volunteer_organization,
+        primaryjoin=(volunteer_organization.c.organization_id == id),
+        secondaryjoin=(volunteer_organization.c.volunteer_id == id),
+        backref=db.backref('organizations', lazy='dynamic'),
+        lazy='dynamic'
+    )
 
 
 def __repr__(self):
