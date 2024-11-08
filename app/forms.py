@@ -10,8 +10,8 @@ from app.email import send_registration_email
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[DataRequired(), Email()], render_kw={'placeholder': 'example@email.com'})
-    password = PasswordField('Password', validators=[DataRequired()], render_kw={'placeholder': '********'})
+    email = StringField('Email', validators=[DataRequired(), Email(), Length(max=64)], render_kw={'placeholder': 'example@email.com'})
+    password = PasswordField('Password', validators=[DataRequired(), Length(max=64)], render_kw={'placeholder': '********'})
     remember_me = BooleanField('Remember me', default=False)
     submit = SubmitField('Log In')
 
@@ -23,15 +23,15 @@ class RegistrationForm(FlaskForm):
         Regexp(r'^[a-zA-Z0-9_]+$', message='Username must contain only letters, numbers, and underscores.')],
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
-        DataRequired(),
+        DataRequired(), Length(max=64),
         Email()
     ], render_kw={'placeholder': 'example@email.com'})
     password = PasswordField('Password', validators=[
         DataRequired(),
-        Length(min=8),
+        Length(min=8, max=64),
     ], render_kw={'placeholder': 'Enter your password'})
     confirm_password = PasswordField('Confirm Password', validators=[
-        DataRequired(),
+        DataRequired(), Length(max=64),
         EqualTo('password', message='Passwords must match')
     ],
                                      render_kw={'placeholder': 'Confirm your password'})
@@ -58,26 +58,26 @@ class EditProfileForm(FlaskForm):
                        render_kw={'placeholder': 'Display name'})
     email = StringField('Email', validators=[
         DataRequired(),
-        Email()
+        Email(), Length(max=64)
     ], render_kw={'placeholder': 'example@email.com'})
     submit = SubmitField('Save Changes')
 
 
 class AddHoursForm(FlaskForm):
-    email = StringField('User Email', validators=[DataRequired(), Email()])
-    hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, message="Hours must be greater than 0")])
+    email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
+    hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, message="Hours must be greater than 0"), Length(max=10)])
     submit = SubmitField('Add Hours')
 
 class RemoveUserForm(FlaskForm):
-    email = StringField('User Email', validators=[DataRequired(), Email()])
+    email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
     submit = SubmitField('Remove User')
 
 class CreateEventForm(FlaskForm):
-    title = StringField('Event Title', validators=[DataRequired()])
-    description = TextAreaField('Description', validators=[DataRequired()])
+    title = StringField('Event Title', validators=[DataRequired(), Length(max=80)])
+    description = TextAreaField('Description', validators=[DataRequired(), Length(max=300)])
     date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired()], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
     submit = SubmitField('Create Event')
 
 class AddMemberForm(FlaskForm):
-    email = StringField('User Email', validators=[DataRequired(), Email()])
+    email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
     submit = SubmitField('Add Volunteer To Your Organization')
