@@ -65,7 +65,9 @@ class EditProfileForm(FlaskForm):
 
 class AddHoursForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
-    hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, message="Hours must be greater than 0"), Length(max=10)])
+    # we don't have to implement this, but an important thing to keep in mind is that only whole hours will be accepted, not increments.
+    # set an input range so there is no undefined behavior. IntegerField is prone to error without setting number range restrictions
+    hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, max=10000, message="Hours must be greater than 0")])
     submit = SubmitField('Add Hours')
 
 class RemoveUserForm(FlaskForm):

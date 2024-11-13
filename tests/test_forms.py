@@ -1,7 +1,7 @@
 import pytest
 from flask import Flask
 from app import create_app
-from app.forms import RegistrationForm, LoginForm
+from app.forms import RegistrationForm, LoginForm, EditProfileForm, AddHoursForm, RemoveUserForm, CreateEventForm
 from tests.conftest import test_client, init_database
 from app.models import db
 
@@ -161,6 +161,12 @@ def test_edit_profile_form_valid_data(test_client, init_database):
     WHEN the edit profile form input is valid
     THEN check if the form is valid
     """
+    data = {
+        'name': 'testvolunteer',
+        'email': 'testvolunteer@example.com'
+    }
+    form = EditProfileForm(data=data)
+    assert form.validate()
 
 def test_edit_profile_form_invalid_data(test_client, init_database):
     """
@@ -168,3 +174,146 @@ def test_edit_profile_form_invalid_data(test_client, init_database):
     WHEN the edit profile form input is invalid
     THEN check if the form is invalid
     """
+    data = {
+        'name': 'testvolunteer!',
+        'email': 'testvolunteer@example.com'
+    }
+    form = EditProfileForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid name"
+
+    data = {
+        'name': 'testvolunteer',
+        'email': 'testvolunteerexample.com',
+    }
+    form = EditProfileForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid email"
+
+def test_add_hours_form_valid_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the add hours form input is valid
+    THEN check if the form is valid
+    """
+    data = {
+        'email': 'testvolunteer@example.com',
+        'hours': '10'
+    }
+    form = AddHoursForm(data=data)
+    assert form.validate(), "Form should be valid"
+
+def test_add_hours_form_invalid_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the add hours form input is invalid
+    THEN check if the form is invalid
+    """
+    data = {
+        'email': 'testvolunteerexample.com',
+        'hours': '10'
+    }
+    form = AddHoursForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid email"
+
+    data = {
+        'email': 'testvolunteer@example.com',
+        'hours': '10.0'
+    }
+    form = AddHoursForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid hours"
+    data = {
+        'email': 'testvolunteer@example.com',
+        'hours': '10aa#'
+    }
+    form = AddHoursForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid hours"
+    data = {
+        'email': 'testvolunteer@example.com',
+        'hours': '0'
+    }
+    form = AddHoursForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid hours"
+
+def test_add_hours_form_missing_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the add hours form input is missing
+    THEN check if the form is invalid
+    """
+    data = {
+        'email': '',
+        'hours': '10'
+    }
+    form = AddHoursForm(data=data)
+    assert not form.validate(), "Form should be invalid with missing email"
+
+    data = {
+        'email': 'testvolunteer@example.com',
+        'hours': ''
+    }
+    form = AddHoursForm(data=data)
+    assert not form.validate(), "Form should be invalid with missing hours"
+
+def test_remove_user_form_valid_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the remove user form input is valid
+    THEN check if the form is valid
+    """
+    data = {
+        'email': 'testvolunteer@example.com'
+    }
+    form = RemoveUserForm(data=data)
+    assert form.validate(), "Form should be valid"
+
+def test_remove_user_form_invalid_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the remove user form input is invalid
+    THEN check if the form is invalid
+    """
+    data = {
+        'email': 'testvolunteerexample.com'
+    }
+    form = RemoveUserForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid email"
+
+def test_remove_user_form_missing_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the remove user form input is missing
+    THEN check if the form is invalid
+    """
+    data = {
+        'email': ''
+    }
+    form = RemoveUserForm(data=data)
+    assert not form.validate(), "Form should be invalid with missing email"
+
+def test_create_event_form_valid_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the create event form input is valid
+    THEN check if the form is valid
+    """
+    data = {
+        'title': 'test event',
+        'description': 'test event description',
+        'date': '2024-12-12 10:00'
+    }
+    form = CreateEventForm(data=data)
+    assert form.validate(), "Form should be valid"
+
+# TODO: Finish this test
+def test_create_event_form_invalid_data(test_client, init_database):
+    """
+    GIVEN a Flask application instance
+    WHEN the create event form input is invalid
+    THEN check if the form is invalid
+    """
+    data = {
+        'title': 'test event',
+        'description': 'test event description',
+        'date': '2024/12/12 10:00'
+    }
+    form = CreateEventForm(data=data)
+    assert not form.validate(), "Form should be invalid with invalid date"
