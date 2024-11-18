@@ -2,7 +2,7 @@
 from flask_login import UserMixin
 
 # Other modules
-from datetime import datetime
+from datetime import datetime, timezone
 
 # Local modules
 from app.extensions import db
@@ -13,7 +13,7 @@ class HoursLog(db.Model):
     added_by_email = db.Column(db.String(255), nullable=False) # The email of the volunteering organization who added the hours
     added_by_username = db.Column(db.String(80), nullable=False)  # The username of the volunteering organization who added the hours
     added_to = db.Column(db.String(255), nullable=False)  # The email of the user who received the hours
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)  # When the hours were added
+    timestamp = db.Column(db.DateTime, default=datetime.now(timezone.utc))  # When the hours were added
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -39,7 +39,7 @@ class User(db.Model, UserMixin):
     name = db.Column(db.String(80), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password = db.Column(db.String, nullable=False)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_date = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     hours_volunteered = db.Column(db.Integer, default=0)
     role = db.Column(db.String(80), nullable=False, default='volunteer')
     volunteers = db.relationship(
