@@ -99,6 +99,7 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
+# TODO: Check for IDOR vuln
 @routes_bp.route("/user/<name>")
 @login_required
 def user_profile(name):
@@ -113,6 +114,7 @@ def leaderboard():
     volunteers = User.query.filter_by(role='volunteer').order_by(User.hours_volunteered.desc()).all()
     return render_template('leaderboard.html', volunteers=volunteers, active_tab='leaderboard')
 
+# TODO: Is this a volunteer-only page?
 @routes_bp.route("/rewards")
 @login_required
 def rewards():
