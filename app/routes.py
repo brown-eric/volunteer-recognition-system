@@ -99,10 +99,13 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-# TODO: Check for IDOR vuln
 @routes_bp.route("/user/<name>")
 @login_required
 def user_profile(name):
+    # Remediated IDOR vuln
+    if current_user.name != name:
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('routes.home'))
     user = User.query.filter_by(name=name).one_or_none()
     hours_logs = HoursLog.query.filter_by(added_to=user.email).all()
     return render_template('user.html', user=user, hours_logs=hours_logs, active_tab='profile')
@@ -114,10 +117,13 @@ def leaderboard():
     volunteers = User.query.filter_by(role='volunteer').order_by(User.hours_volunteered.desc()).all()
     return render_template('leaderboard.html', volunteers=volunteers, active_tab='leaderboard')
 
-# TODO: Is this a volunteer-only page?
 @routes_bp.route("/rewards")
 @login_required
 def rewards():
+    if current_user.role != 'volunteer':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('routes.home'))
+
     user = current_user
     rewards = [
         {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours'},
@@ -137,11 +143,10 @@ def rewards():
 
     return render_template('rewards.html', rewards=user_rewards, active_tab='rewards')
 
-
 @routes_bp.route("/add_hours", methods=['GET', 'POST'])
 @login_required
 def add_hours():
-    if current_user.role == 'volunteer':
+    if current_user.role != 'volunteering organization':
         flash('You do not have permission to add hours.', 'danger')
         return redirect(url_for('routes.home'))
 
@@ -231,7 +236,7 @@ def view_database():
 @login_required
 def create_event():
     if current_user.role != 'volunteering organization':
-        flash('Only volunteer organizations can create events.', 'danger')
+        flash('You do not have permission to create events.', 'danger')
         return redirect(url_for('routes.home'))
 
     form = CreateEventForm()
@@ -278,7 +283,7 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
-    if current_user.role == 'volunteer':
+    if current_user.role != 'volunteering organization':
         flash('You do not have permission to add a member.', 'danger')
         return redirect(url_for('routes.home'))
 
