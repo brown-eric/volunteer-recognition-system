@@ -3,7 +3,7 @@
 {% block title %}Profile - {{ user.name }}{% endblock %}
 
 {% block content %}
-
+<div class="table-page">
     <h2>Profile for {{ user.name }}</h2>
     <p><strong>Name:</strong> {{ user.name }}</p>
     <p><strong>Email:</strong> {{ user.email }}</p>
@@ -63,4 +63,5 @@
     </tbody>
 </table>
     {% endif %}
+</div>
 {% endblock %}

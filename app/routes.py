@@ -278,9 +278,6 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
-    if current_user.role == 'volunteer':
-        flash('You do not have permission to add a member.', 'danger')
-        return redirect(url_for('routes.home'))
 
     form = AddMemberForm()
     email_invalid = False  # Flag for invalid email
@@ -335,6 +332,33 @@ def remove_member(volunteer_id):
         flash('This user is not a member of your organization', 'danger')
         return redirect(url_for('routes.remove_member'))
     return render_template('manage_memberships.html', form=form, active_tab='manage-memberships')
+
+@routes_bp.route("/remove_org/<int:org_id>", methods=['GET', 'POST'])
+@login_required
+def remove_org(org_id):
+    if current_user.role != 'volunteer':
+        flash('You are not a volunteer.', 'danger')
+        return redirect(url_for('routes.home'))
+    org = User.query.filter_by(id=org_id, role='volunteering organization').first()
+    if org.role != 'volunteering organization':
+        flash('This user is not an organization.', 'danger')
+        return redirect(url_for('routes.remove_org'))
+
+    form=AddMemberForm()
+    email_invalid = False
+
+    if org in current_user.organizations:
+        # Remove the given volunteer
+        current_user.organizations.remove(org)
+        db.session.commit()
+
+        flash(f'Successfully removed {org.name}.', 'success')
+    else:
+        # Flash message and set flag for invalid email
+        flash('You are not a member of this organization', 'danger')
+        return redirect(url_for('routes.remove_org'))
+    return render_template('manage_memberships.html', form=form, active_tab='manage-memberships')
+
 
 @routes_bp.route("/logout", methods=['GET', 'POST'])
 @login_required

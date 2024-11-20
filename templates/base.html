@@ -6,6 +6,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="icon" href="{{ url_for('static', filename='images/group.png') }}" type="image/png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Audiowide&family=Kumbh+Sans:wght@100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap" rel="stylesheet">
     <title>{% block title %}{% endblock title %}</title>
 </head>
 <body>
@@ -19,6 +25,11 @@
 {% endfor %}
 {% endif %}
 {% endwith %}
+
+<div id="logo">
+    <h1>VolunteerConnect</h1>
+    <img src="{{ url_for('static', filename='images/group.png') }}" alt="Group Image" style="height:5rem; width:auto">
+</div>
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -41,6 +52,9 @@
         {% if current_user.role == 'volunteer' %}
             <li class="nav-item">
                 <a class="nav-link {% if active_tab == 'rewards' %}active{% endif %}" href="{{ url_for('routes.rewards') }}">My Rewards</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link {% if active_tab == 'manage-memberships' %}active{% endif %}" href="{{ url_for('routes.add_member') }}">Manage Memberships</a>
             </li>
         {% endif %}
 
@@ -80,11 +94,10 @@
     {% endif %}
 </ul>
 
-
-<main class="p-2">
-    {% block content %}
-    {% endblock content %}
-</main>
+<div class="content">
+{% block content %}
+{% endblock content %}
+</div>
 
 <footer>
     <p>&copy; 2024 Volunteer Reward System</p>
