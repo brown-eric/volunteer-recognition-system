@@ -7,7 +7,7 @@
 
     <form action="{{ url_for('routes.edit_profile') }}" method="POST">
         {{ form.hidden_tag() }}
-        
+
         <div class="form-group">
             {{ form.name.label }}
             {{ form.name(class="form-control") }}

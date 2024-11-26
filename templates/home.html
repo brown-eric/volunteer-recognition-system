@@ -1,12 +1,24 @@
 {% extends 'base.html' %}
 
+
 {% block title %}Information Page{% endblock %}
 
 {% block content %}
+    <div style="height: 90vh;
+            width: 100vw;
+         opacity: 0.3;
+         padding: 0;
+         background-image: url('{{ url_for('static', filename='images/pexels-marta-ortigosa-1877261-3480494.webp') }}');
+         background-size: cover;
+         background-position: center;
+         background-repeat: no-repeat;
+         background-attachment: fixed;
+         position: absolute;
+         z-index:-1;">
+    </div>
     <main class="p-2">
         <header>
-            <h1>Welcome to the Volunteer Reward and Recognition System</h1>
-            <img src="{{ url_for('static', filename='images/group.png') }}" alt="Group Image">
+            <h1>Welcome to the Volunteer Reward and Recognition System!</h1>
 {#            <nav>#}
 {#                <ul>#}
 {#                    <li><a href="{{ url_for('routes.home') }}">Home</a></li>#}
@@ -28,7 +40,7 @@
 
         <section class="features">
             <h2>Features</h2>
-            <ul>
+            <ul class="compact-list">
                 <li>Track volunteer hours</li>
                 <li>Earn rewards and badges</li>
                 <li>View progress and leaderboards</li>
