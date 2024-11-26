@@ -1,3 +1,4 @@
+
 #logo {
   padding: 0.5rem;
   text-align: left;
@@ -13,8 +14,8 @@
 }
 
 #learn-more {
-    margin: 3rem;
-    margin-bottom: 11rem;
+    margin:3rem;
+    margin-bottom:11rem;
     padding: 10px 20px;
     border-radius: 4px;
     background-color:#023020;

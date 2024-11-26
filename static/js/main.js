@@ -6,7 +6,9 @@ function autocomplete(inp, arr) {
     inp.addEventListener("input", function () {
         var a, b, i, val = this.value;
         closeAllLists();
-        if (!val) { return false; }
+        if (!val) {
+            return false;
+        }
         currentFocus = -1;
 
         a = document.createElement("DIV");

@@ -331,9 +331,6 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
-    # if current_user.role != 'volunteering organization':
-    #     flash('You do not have permission to add a member.', 'danger')
-    #     return redirect(url_for('routes.home'))
 
     form = AddMemberForm()
     email_invalid = False  # Flag for invalid email
