@@ -3,50 +3,91 @@
 {% block title %}Add New Members{% endblock %}
 
 {% block content %}
-    <h2>Add New Members</h2>
+<div class="table-page">
 
-    <form action="{{ url_for('routes.add_member') }}" method="POST">
-        {{ form.hidden_tag() }}
+{% if current_user.role == 'volunteering organization' %}
 
-        <div class="form-group">
-            {{ form.email.label }}
-            {{ form.email(class="form-control") }}
-        </div>
+        <h2>Add New Members</h2>
 
-        <div class="form-group">
-            {{ form.submit(class="btn btn-danger") }}
-        </div>
-    </form>
+        <form action="{{ url_for('routes.add_member') }}" method="POST">
+            {{ form.hidden_tag() }}
 
-    <h3>Volunteers In {{ current_user.name }}</h3>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Name</th>
-                <th>Email</th>
-                <td>Actions</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for user in current_user.volunteers %}
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.submit(class="btn btn-danger") }}
+            </div>
+        </form>
+
+        <h2>Volunteers In {{ current_user.name }}</h2>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>{{ user.name }}</td>
-                    <td>{{ user.email }}</td>
-                    <td>
-                        <!-- Remove button -->
-                        <form action="{{ url_for('routes.remove_member', volunteer_id=user.id) }}" method="POST" style="display: inline;">
-                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove {{ user.name }}?');">
-                                Remove
-                            </button>
-                        </form>
-                    </td>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <td>Actions</td>
                 </tr>
-            {% else %}
+            </thead>
+            <tbody>
+                {% for user in current_user.volunteers %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <!-- Remove button -->
+                            <form action="{{ url_for('routes.remove_member', volunteer_id=user.id) }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove {{ user.name }}?');">
+                                    Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No current members</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+{% elif current_user.role == 'volunteer' %}
+
+        <h2>Your Organizations</h2>
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td colspan="4">No current members</td>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <td>Actions</td>
                 </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                {% for user in current_user.organizations %}
+                    <tr>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>
+                            <!-- Remove button -->
+                            <form action="{{ url_for('routes.remove_org', org_id=user.id) }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove {{ user.name }}?');">
+                                    Remove
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="4">No current memberships</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+{% endif %}
+</div>
+
 {% endblock %}
