@@ -150,17 +150,26 @@ def rewards():
     user_rewards = [reward for reward in rewards if total_hours >= reward['threshold']]
     next_reward = next((reward for reward in rewards if total_hours < reward['threshold']), None)
 
-    progress = 0
     if next_reward:
         progress = (total_hours / next_reward['threshold']) * 100
+        progress_color = "bg-warning"  # Default color for bronze
+        if next_reward['threshold'] == 20:
+            progress_color = "bg-secondary"  # Silver
+        elif next_reward['threshold'] == 30:
+            progress_color = "bg-warning"  # Gold
+    else:
+        progress = 100  # All rewards completed
+        progress_color = "bg-success"  # Green for completed
 
     return render_template(
         'rewards.html',
         rewards=user_rewards,
         next_reward=next_reward,
         progress=progress,
+        progress_color=progress_color,
         active_tab='rewards'
     )
+
 
 
 
