@@ -10,4 +10,11 @@
         {% endfor %}
     </ul>
 
-
+    <h3 class="mt-4">Progress Toward Your Next Reward</h3>
+    {% if next_threshold %}
+        <div class="progress">
+            <div
+                class="progress-bar {% if progress < 33 %}bronze{% elif progress < 66 %}silver{% else %}gold{% endif %}"
+                role="progressbar"
+                style="width: {{ progress }}%;"
+                aria-valuenow="{{ progress }}"
