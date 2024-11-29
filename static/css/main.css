@@ -174,4 +174,17 @@ main {
 }
 
 /* Colors for different progress levels */
+.progress-bar.bronze {
+    background-color: #a52a2a; /* Brown */
+}
 
+.progress-bar.silver {
+    background-color: #c0c0c0; /* Silver */
+}
+
+.progress-bar.gold {
+    background-color: #ffd700; /* Gold */
+}
+
+
+}
