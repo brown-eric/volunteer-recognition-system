@@ -152,11 +152,13 @@ def rewards():
 
     if next_reward:
         progress = (total_hours / next_reward['threshold']) * 100
-        progress_color = "bg-warning"  # Default color for bronze
+        progress_color = "bg-warning"  # Default for bronze
         if next_reward['threshold'] == 20:
             progress_color = "bg-secondary"  # Silver
         elif next_reward['threshold'] == 30:
             progress_color = "bg-warning"  # Gold
+        elif next_reward['threshold'] == 50:
+            progress_color = "bg-primary"  # Platinum (Blue)
     else:
         progress = 100  # All rewards completed
         progress_color = "bg-success"  # Green for completed
@@ -169,6 +171,7 @@ def rewards():
         progress_color=progress_color,
         active_tab='rewards'
     )
+
 
 
 
