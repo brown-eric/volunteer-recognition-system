@@ -6,7 +6,6 @@ from wtforms import StringField, PasswordField, BooleanField, SubmitField, Selec
 
 # Local modules
 from app.models import User, HoursLog, Event
-from app.email import send_registration_email
 
 # TODO: Whitelist or blacklist or escape sanitize field inputs, find a function for this
 class LoginForm(FlaskForm):
@@ -70,6 +69,21 @@ class AddHoursForm(FlaskForm):
     # set an input range so there is no undefined behavior. IntegerField is prone to error without setting number range restrictions
     hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, max=10000, message="Hours must be greater than 0")])
     submit = SubmitField('Add Hours')
+
+class AddUserForm(FlaskForm):
+    name = StringField('Username', validators=[
+        DataRequired(),
+        Length(min=2, max=80),
+        Regexp(r'^[a-zA-Z0-9_]+$', message='Username must contain only letters, numbers, and underscores.')],
+                       render_kw={'placeholder': 'Display name'})
+    email = StringField('Email', validators=[
+        DataRequired(), Length(max=64),
+        Email(), validate_email  # testing validate_email
+    ], render_kw={'placeholder': 'example@email.com'})
+    role = SelectField('Role',
+                       choices=[('volunteering organization', 'Volunteering Organization'),
+                                ('admin', 'Admin')], validators=[DataRequired()])
+    submit = SubmitField('Register')
 
 class RemoveUserForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])

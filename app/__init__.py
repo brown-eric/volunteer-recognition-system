@@ -2,6 +2,8 @@
 from flask import Flask
 from flask_migrate import Migrate
 from flask_mail import Mail
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 
 def create_app(debug: bool = False) -> Flask:
@@ -36,6 +38,9 @@ def create_app(debug: bool = False) -> Flask:
 
     # Register blueprints
     from app.routes import routes_bp
+    # Limiter https://flask-limiter.readthedocs.io/en/stable/recipes.html
+    limiter = Limiter(get_remote_address, app=app, default_limits=["5/second"])
+    limiter.limit("5/second")(routes_bp)
     app.register_blueprint(routes_bp)
 
 

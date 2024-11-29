@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Add Organization or Admin Users
+{% endblock title %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">Create New Volunteer Organization or Admin Users</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="form-group">
+                    {{ form.name.label(class="form-control-label") }}
+                    {{ form.name(class="form-control" + (' is-invalid' if form.name.errors else '') ) }}
+                    {% for error in form.name.errors %}
+                    <div class="invalid-feedback">
+                        {{ error }}
+                    </div>
+                    {% endfor %}
+                </div>
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {{ form.email(class="form-control" + (' is-invalid' if form.email.errors else '') ) }}
+                    {% if form.email.errors %}
+                    <div class="invalid-feedback">
+                        {{ form.email.errors[0] }}
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ form.role.label }}
+                    {{ form.role(class="form-control") }}
+                </div>
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-primary btn-block") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -1,8 +1,9 @@
 import pytest_flask
 import pytest
 from app import create_app
-from app.models import db, User
+from app.models import db, User, Event
 from app.extensions import bcrypt
+from datetime import datetime
 
 @pytest.fixture(scope='module')
 def app():
@@ -38,4 +39,6 @@ def init_database():
     db.session.commit()
     testadmin = User(name='testadmin', email='testadmin@example.com', password=hashed_password, role='admin')
     db.session.add(testadmin)
+    testevent = Event(title='testevent', description='event for testing signup', date=datetime(2050,12,12,12,12), created_by='testorg')
+    db.session.add(testevent)
     db.session.commit()

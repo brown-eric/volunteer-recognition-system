@@ -1,7 +1,14 @@
 # Flask modules
-from flask import Blueprint, redirect, url_for, render_template, flash, request
+#from crypt import methods
+import string
+import secrets
+from markupsafe import escape
+from flask import Blueprint, redirect, url_for, render_template, flash, request, make_response, jsonify
 from flask_login import login_user, logout_user, current_user, login_required
 
+from app.email import send_volunteer_registration_email, send_org_admin_registration_email
+
+alphabet = string.ascii_letters + string.digits
 # Local modules
 from app.extensions import db, bcrypt, login_manager
 from app.forms import *
@@ -13,6 +20,13 @@ routes_bp = Blueprint('routes', __name__, url_prefix="/")
 def load_user(user_id):
     return User.query.filter_by(id=user_id).one_or_none()
 
+# https://flask-limiter.readthedocs.io/en/stable/recipes.html
+@routes_bp.errorhandler(429)
+def ratelimit_handler(e):
+    return make_response(
+            jsonify(error=f"ratelimit exceeded {e.description}")
+            , 429
+    )
 
 @routes_bp.route("/")
 @login_required
@@ -44,7 +58,6 @@ def edit_profile():
     return render_template('edit_profile.html', form=form, active_tab='profile')
 
 
-
 @routes_bp.route("/login", methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -53,8 +66,9 @@ def login():
     form = LoginForm()
 
     if form.validate_on_submit():
-        email = form.email.data
-        password = form.password.data
+        """ https://flask.palletsprojects.com/en/stable/quickstart/ """
+        email = escape(form.email.data)
+        password = escape(form.password.data)
         remember_me = form.remember_me.data
 
         user = User.query.filter_by(email=email).one_or_none()
@@ -76,9 +90,9 @@ def register():
     form = RegistrationForm()
 
     if form.validate_on_submit():
-        name = form.name.data
-        email = form.email.data
-        password = form.password.data
+        name = escape(form.name.data)
+        email = escape(form.email.data)
+        password = escape(form.password.data)
         role = form.role.data
 
         hashed_password = bcrypt.generate_password_hash(password)
@@ -89,7 +103,7 @@ def register():
         db.session.commit()
 
         #email confirmation
-        send_registration_email(email, name)
+        send_volunteer_registration_email(email, name)
 
         # Login user
         login_user(new_user)
@@ -99,10 +113,13 @@ def register():
 
     return render_template('auth/register.html', form=form)
 
-# TODO: Check for IDOR vuln
 @routes_bp.route("/user/<name>")
 @login_required
 def user_profile(name):
+    # Remediated IDOR vuln
+    if current_user.name != name:
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('routes.home'))
     user = User.query.filter_by(name=name).one_or_none()
     hours_logs = HoursLog.query.filter_by(added_to=user.email).all()
     return render_template('user.html', user=user, hours_logs=hours_logs, active_tab='profile')
@@ -114,10 +131,13 @@ def leaderboard():
     volunteers = User.query.filter_by(role='volunteer').order_by(User.hours_volunteered.desc()).all()
     return render_template('leaderboard.html', volunteers=volunteers, active_tab='leaderboard')
 
-# TODO: Is this a volunteer-only page?
 @routes_bp.route("/rewards")
 @login_required
 def rewards():
+    if current_user.role != 'volunteer':
+        flash('You do not have permission to access this page.', 'danger')
+        return redirect(url_for('routes.home'))
+
     user = current_user
     rewards = [
         {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours'},
@@ -137,11 +157,11 @@ def rewards():
 
     return render_template('rewards.html', rewards=user_rewards, active_tab='rewards')
 
-
 @routes_bp.route("/add_hours", methods=['GET', 'POST'])
 @login_required
 def add_hours():
-    if current_user.role == 'volunteer':
+    """ Only volunteering organization accounts can add hours """
+    if current_user.role != 'volunteering organization':
         flash('You do not have permission to add hours.', 'danger')
         return redirect(url_for('routes.home'))
 
@@ -188,6 +208,39 @@ def add_hours():
     return render_template('add_hours.html', form=form, email_invalid=email_invalid, active_tab='add-hours', email_data=email_list)
 
 
+@routes_bp.route("/add_user", methods=['GET', 'POST'])
+@login_required
+def add_user():
+    if current_user.role != 'admin':
+        flash('You do not have permission to add users.', 'danger')
+        return redirect(url_for('routes.home'))
+
+    form = AddUserForm()
+
+    if form.validate_on_submit():
+        name = escape(form.name.data)
+        email = escape(form.email.data)
+        role = form.role.data
+
+        """ https://docs.python.org/3/library/secrets.html """
+        while True:
+            password = ''.join(secrets.choice(alphabet) for i in range(10))
+            if (any(c.islower() for c in password)
+                    and any(c.isupper() for c in password)
+                    and sum(c.isdigit() for c in password) >= 3):
+                break
+
+        hashed_password = bcrypt.generate_password_hash(password)
+
+        # Add user to database
+        new_user = User(name=name, email=email, password=hashed_password, role=role)
+        db.session.add(new_user)
+        db.session.commit()
+
+        send_org_admin_registration_email(email, name, password)
+
+    return render_template('add_user.html', form=form)
+
 @routes_bp.route("/remove_user", methods=['GET', 'POST'])
 @login_required
 def remove_user():
@@ -231,7 +284,7 @@ def view_database():
 @login_required
 def create_event():
     if current_user.role != 'volunteering organization':
-        flash('Only volunteer organizations can create events.', 'danger')
+        flash('You do not have permission to create events.', 'danger')
         return redirect(url_for('routes.home'))
 
     form = CreateEventForm()
@@ -326,7 +379,7 @@ def remove_member(volunteer_id):
         current_user.volunteers.remove(volunteer)
         db.session.commit()
 
-        flash(f'Successfully added {volunteer.name}.', 'success')
+        flash(f'Successfully removed {volunteer.name}.', 'success')
     else:
         # Flash message and set flag for invalid email
         flash('This user is not a member of your organization', 'danger')
@@ -358,7 +411,6 @@ def remove_org(org_id):
         flash('You are not a member of this organization', 'danger')
         return redirect(url_for('routes.remove_org'))
     return render_template('manage_memberships.html', form=form, active_tab='manage-memberships')
-
 
 @routes_bp.route("/logout", methods=['GET', 'POST'])
 @login_required
