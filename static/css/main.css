@@ -186,5 +186,14 @@ main {
     background-color: #ffd700; /* Gold */
 }
 
+.reward-section p {
+    text-align: center;
+    font-size: 1rem;
+    margin-top: 10px;
+    color: #555;
+}
 
+.reward-section p.text-success {
+    color: #28a745;
+    font-weight: bold;
 }
