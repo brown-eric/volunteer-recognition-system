@@ -350,7 +350,6 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
-
     form = AddMemberForm()
     email_invalid = False  # Flag for invalid email
 
@@ -359,17 +358,19 @@ def add_member():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            # Check if the user is a volunteer
-            if user.role != 'volunteer':
-                flash(f'Cannot add member. {user.name} is not a volunteer.', 'danger')
+            # Check if the user is already part of the organization
+            if user in current_user.volunteers:
+                flash(f'{user.name} is already a member of your organization.', 'info')
             else:
-                # Add the member
-                current_user.volunteers.append(user)
-                db.session.commit()  # Commit the changes to the database
+                # Check if the user is a volunteer
+                if user.role != 'volunteer':
+                    flash(f'Cannot add member. {user.name} is not a volunteer.', 'danger')
+                else:
+                    # Add the member
+                    current_user.volunteers.append(user)
+                    db.session.commit()  # Commit the changes to the database
 
-                # Log the addition of hours
-
-                flash(f'Successfully added {user.name}.', 'success')
+                    flash(f'Successfully added {user.name}.', 'success')
         else:
             # Flash message and set flag for invalid email
             flash('No user found with that email address. Please try again.', 'danger')
@@ -378,6 +379,7 @@ def add_member():
         return redirect(url_for('routes.add_member'))
 
     return render_template('manage_memberships.html', form=form, email_invalid=email_invalid, active_tab='manage-memberships')
+
 
 @routes_bp.route("/remove_member/<int:volunteer_id>", methods=['GET', 'POST'])
 @login_required
