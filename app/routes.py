@@ -139,23 +139,30 @@ def rewards():
         return redirect(url_for('routes.home'))
 
     user = current_user
+    total_hours = user.hours_volunteered
     rewards = [
-        {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours'},
-        {'name': 'Silver Badge', 'description': 'Awarded for 20 volunteer hours'},
-        {'name': 'Gold Badge', 'description': 'Awarded for 30 volunteer hours'},
-        {'name': 'Platinum Badge', 'description': 'Awarded for 50 volunteer hours'},
+        {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours', 'threshold': 10},
+        {'name': 'Silver Badge', 'description': 'Awarded for 20 volunteer hours', 'threshold': 20},
+        {'name': 'Gold Badge', 'description': 'Awarded for 30 volunteer hours', 'threshold': 30},
+        {'name': 'Platinum Badge', 'description': 'Awarded for 50 volunteer hours', 'threshold': 50},
     ]
-    user_rewards = []
-    if user.hours_volunteered >= 50:
-        user_rewards.append(rewards[3])  # Platinum Badge
-    if user.hours_volunteered >= 30:
-        user_rewards.append(rewards[2])  # Gold Badge
-    if user.hours_volunteered >= 20:
-        user_rewards.append(rewards[1])  # Silver Badge
-    if user.hours_volunteered >= 10:
-        user_rewards.append(rewards[0])  # Bronze Badge
 
-    return render_template('rewards.html', rewards=user_rewards, active_tab='rewards')
+    user_rewards = [reward for reward in rewards if total_hours >= reward['threshold']]
+    next_reward = next((reward for reward in rewards if total_hours < reward['threshold']), None)
+
+    progress = 0
+    if next_reward:
+        progress = (total_hours / next_reward['threshold']) * 100
+
+    return render_template(
+        'rewards.html',
+        rewards=user_rewards,
+        next_reward=next_reward,
+        progress=progress,
+        active_tab='rewards'
+    )
+
+
 
 @routes_bp.route("/add_hours", methods=['GET', 'POST'])
 @login_required
