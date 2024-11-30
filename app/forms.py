@@ -91,7 +91,7 @@ class RemoveUserForm(FlaskForm):
 class CreateEventForm(FlaskForm):
     title = StringField('Event Title', validators=[DataRequired(), Length(max=80)])
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=300)])
-    date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired(), Length(min=12, max=16)], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
+    date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired()], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
     submit = SubmitField('Create Event')
 
 class AddMemberForm(FlaskForm):

@@ -122,6 +122,10 @@ def test_volunteer_redirects(test_client, init_database):
     assert response.status_code == 200
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 200
+    response = test_client.get('/add_member')
+    assert response.status_code == 200
+    response = test_client.get('/events')
+    assert response.status_code == 200
     """
     WHEN a volunteer requests non-volunteer access pages
     THEN check for redirects.
@@ -131,8 +135,6 @@ def test_volunteer_redirects(test_client, init_database):
     response = test_client.get('/remove_user')
     assert response.status_code == 302
     response = test_client.get('/view_database')
-    assert response.status_code == 302
-    response = test_client.get('/add_member')
     assert response.status_code == 302
     response = test_client.get('/create_event')
     assert response.status_code == 302
@@ -180,9 +182,9 @@ def test_admin_redirects(test_client, init_database):
     THEN check for accepted response.
     """
     response = login(test_client, 'testadmin@example.com', 'password123')
-    response = test_client.get('/remove_user')
-    assert response.status_code == 200
     response = test_client.get('/view_database')
+    assert response.status_code == 200
+    response = test_client.get('/remove_user')
     assert response.status_code == 200
     """
     WHEN an admin requests non-admin access pages
@@ -202,3 +204,19 @@ def test_admin_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/logout')
 
+def test_event(test_client, init_database):
+    response = login(test_client, 'testorg@example.com', 'password123')
+    response = create_event(test_client, 'test event', 'event for testing signup', '2024-11-12 12:12')
+    response = test_client.get('/logout')
+    response = login(test_client, 'testvolunteer@example.com', 'password123')
+    response = test_client.get('/events')
+    events = Event.query.order_by(Event.date).all()
+    test_event_id = events[0].id
+    response = test_client.get(f'/signup_event/{test_event_id}')
+    assert response.status_code == 302
+    """ Test response for duplicate request """
+    response = test_client.get(f'/signup_event/{test_event_id}')
+    assert response.status_code == 302
+    """ Test for wrong event id"""
+    response = test_client.get('/signup_event/5')
+    assert response.status_code == 302

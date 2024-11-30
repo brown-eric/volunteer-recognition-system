@@ -348,9 +348,13 @@ def signup_event(event_id):
         return redirect(url_for('routes.events'))
 
     if event:
-        event.attendees.append(current_user)
-        db.session.commit()
-        flash('Successfully signed up for the event!', 'success')
+        if current_user in event.attendees:
+            flash('Volunteer already signed up for this event.')
+            return redirect(url_for('routes.events'))
+        else:
+            event.attendees.append(current_user)
+            db.session.commit()
+            flash('Successfully signed up for the event!', 'success')
     else:
         flash('Event not found.', 'danger')
 
@@ -359,6 +363,9 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
+    if current_user.role == 'admin':
+        flash('You do not have permission to add members.', 'danger')
+        return redirect(url_for('routes.home'))
     form = AddMemberForm()
     email_invalid = False  # Flag for invalid email
 
