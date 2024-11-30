@@ -139,23 +139,42 @@ def rewards():
         return redirect(url_for('routes.home'))
 
     user = current_user
+    total_hours = user.hours_volunteered
     rewards = [
-        {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours'},
-        {'name': 'Silver Badge', 'description': 'Awarded for 20 volunteer hours'},
-        {'name': 'Gold Badge', 'description': 'Awarded for 30 volunteer hours'},
-        {'name': 'Platinum Badge', 'description': 'Awarded for 50 volunteer hours'},
+        {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours', 'threshold': 10},
+        {'name': 'Silver Badge', 'description': 'Awarded for 20 volunteer hours', 'threshold': 20},
+        {'name': 'Gold Badge', 'description': 'Awarded for 30 volunteer hours', 'threshold': 30},
+        {'name': 'Platinum Badge', 'description': 'Awarded for 50 volunteer hours', 'threshold': 50},
     ]
-    user_rewards = []
-    if user.hours_volunteered >= 50:
-        user_rewards.append(rewards[3])  # Platinum Badge
-    if user.hours_volunteered >= 30:
-        user_rewards.append(rewards[2])  # Gold Badge
-    if user.hours_volunteered >= 20:
-        user_rewards.append(rewards[1])  # Silver Badge
-    if user.hours_volunteered >= 10:
-        user_rewards.append(rewards[0])  # Bronze Badge
 
-    return render_template('rewards.html', rewards=user_rewards, active_tab='rewards')
+    user_rewards = [reward for reward in rewards if total_hours >= reward['threshold']]
+    next_reward = next((reward for reward in rewards if total_hours < reward['threshold']), None)
+
+    if next_reward:
+        progress = (total_hours / next_reward['threshold']) * 100
+        progress_color = "bg-warning"  # Default for bronze
+        if next_reward['threshold'] == 20:
+            progress_color = "bg-secondary"  # Silver
+        elif next_reward['threshold'] == 30:
+            progress_color = "bg-warning"  # Gold
+        elif next_reward['threshold'] == 50:
+            progress_color = "bg-primary"  # Platinum (Blue)
+    else:
+        progress = 100  # All rewards completed
+        progress_color = "bg-success"  # Green for completed
+
+    return render_template(
+        'rewards.html',
+        rewards=user_rewards,
+        next_reward=next_reward,
+        progress=progress,
+        progress_color=progress_color,
+        active_tab='rewards'
+    )
+
+
+
+
 
 @routes_bp.route("/add_hours", methods=['GET', 'POST'])
 @login_required
@@ -331,7 +350,6 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
-
     form = AddMemberForm()
     email_invalid = False  # Flag for invalid email
 
@@ -340,17 +358,19 @@ def add_member():
         user = User.query.filter_by(email=form.email.data).first()
 
         if user:
-            # Check if the user is a volunteer
-            if user.role != 'volunteer':
-                flash(f'Cannot add member. {user.name} is not a volunteer.', 'danger')
+            # Check if the user is already part of the organization
+            if user in current_user.volunteers:
+                flash(f'{user.name} is already a member of your organization.', 'info')
             else:
-                # Add the member
-                current_user.volunteers.append(user)
-                db.session.commit()  # Commit the changes to the database
+                # Check if the user is a volunteer
+                if user.role != 'volunteer':
+                    flash(f'Cannot add member. {user.name} is not a volunteer.', 'danger')
+                else:
+                    # Add the member
+                    current_user.volunteers.append(user)
+                    db.session.commit()  # Commit the changes to the database
 
-                # Log the addition of hours
-
-                flash(f'Successfully added {user.name}.', 'success')
+                    flash(f'Successfully added {user.name}.', 'success')
         else:
             # Flash message and set flag for invalid email
             flash('No user found with that email address. Please try again.', 'danger')
@@ -359,6 +379,7 @@ def add_member():
         return redirect(url_for('routes.add_member'))
 
     return render_template('manage_memberships.html', form=form, email_invalid=email_invalid, active_tab='manage-memberships')
+
 
 @routes_bp.route("/remove_member/<int:volunteer_id>", methods=['GET', 'POST'])
 @login_required
