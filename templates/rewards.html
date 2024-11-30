@@ -11,7 +11,29 @@
                 <strong>{{ reward.name }}</strong>: {{ reward.description }}
             </li>
         {% else %}
-            <p>No rewards yet. Keep volunteering!</p>
+            <li class="list-group-item">No rewards yet. Keep volunteering!</li>
         {% endfor %}
     </ul>
+
+    <h3 class="mt-4">Progress Toward Your Next Reward</h3>
+    <div class="progress" style="height: 30px; position: relative;">
+        <div
+            class="progress-bar {{ progress_color }}"
+            role="progressbar"
+            style="width: {{ progress }}%;"
+            aria-valuenow="{{ progress }}"
+            aria-valuemin="0"
+            aria-valuemax="100">
+        </div>
+        <span style="position: absolute; width: 100%; text-align: center; line-height: 30px; font-weight: bold; color: black;">
+            {% if next_reward %}
+                {{ progress|round(1) }}%
+            {% else %}
+                All current rewards achieved. Check back for additional rewards!
+            {% endif %}
+        </span>
+    </div>
+    {% if next_reward %}
+        <p>You are <strong>{{ next_reward.threshold - current_user.hours_volunteered }}</strong> hours away from achieving the <strong>{{ next_reward.name }}</strong>!</p>
+    {% endif %}
 {% endblock %}

@@ -43,9 +43,8 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[
         DataRequired(), Length(max=64),
         EqualTo('password', message='Passwords must match')
-    ],
+        ],
                                      render_kw={'placeholder': 'Confirm your password'})
-    # VULN: No controls to prevent any user from registering as an org or admin
     role = SelectField('Are you a', choices=[('volunteer', 'Volunteer'), ('volunteering organization', 'Volunteering Organization'),
                                              ('admin', 'Admin')], validators=[DataRequired()])
     submit = SubmitField('Register')

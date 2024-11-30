@@ -26,10 +26,11 @@
 {% endif %}
 {% endwith %}
 
-<div id="logo">
-    <h1>VolunteerConnect</h1>
-    <img src="{{ url_for('static', filename='images/group.png') }}" alt="Group Image" style="height:5rem; width:auto">
+<div id="logo" style="display: flex; align-items: center;">
+    <img src="{{ url_for('static', filename='../images/VolunteerConnectLogo.png') }}" alt="VolunteerConnect Logo" style="height: 5rem; margin-right: 1rem;">
+    <h1 style="margin: 0; font-family: 'Audiowide', sans-serif; color: #023020;">VolunteerConnect</h1>
 </div>
+
 
 <ul class="nav nav-tabs">
     <li class="nav-item">
@@ -98,7 +99,7 @@
 </div>
 
 <footer>
-    <p>&copy; 2024 Volunteer Reward System</p>
+    <p>&copy;VolunteerConnect</p>
 </footer>
 
 <!-- Include Bootstrap JS -->

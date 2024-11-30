@@ -122,7 +122,6 @@ def test_volunteer_redirects(test_client, init_database):
     assert response.status_code == 200
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 200
-    # TODO: Test navigating to signup event page. Issue: I need the event ID and I don't know how to get it
     """
     WHEN a volunteer requests non-volunteer access pages
     THEN check for redirects.
@@ -137,8 +136,6 @@ def test_volunteer_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/create_event')
     assert response.status_code == 302
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 302
     response = test_client.get('/user/testorg')
     assert response.status_code == 302
     response = test_client.get('/user/testadmin')
@@ -155,8 +152,6 @@ def test_org_redirects(test_client, init_database):
     response = login(test_client, 'testorg@example.com', 'password123')
     response = test_client.get('/add_hours')
     assert response.status_code == 200
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 200
     response = test_client.get('/add_member')
     assert response.status_code == 200
     response = test_client.get('/create_event')
@@ -171,9 +166,6 @@ def test_org_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/view_database')
     assert response.status_code == 302
-    #  TODO: Figure out signup_event test
-    # response = test_client.get(f'/signup_event/{event_id}')
-    # assert response.status_code == 302
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 302
     response = test_client.get('/user/testadmin')
@@ -204,9 +196,6 @@ def test_admin_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/rewards')
     assert response.status_code == 302
-    # TODO: Figure out how to get user id
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 200
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 302
     response = test_client.get('/user/testorg')
