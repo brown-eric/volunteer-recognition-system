@@ -1,3 +1,4 @@
+# Local modules
 from tests.conftest import test_client, init_database
 from app.models import Event
 

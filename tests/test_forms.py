@@ -1,5 +1,5 @@
-from app.forms import RegistrationForm, LoginForm, EditProfileForm, AddHoursForm, AddUserForm, RemoveUserForm, CreateEventForm, \
-    AddMemberForm
+# Local modules
+from app.forms import RegistrationForm, LoginForm, EditProfileForm, AddHoursForm, AddUserForm, RemoveUserForm, CreateEventForm, AddMemberForm
 from tests.conftest import test_client, init_database
 
 def test_registration_form_valid_data(app):

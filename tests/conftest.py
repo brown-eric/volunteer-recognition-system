@@ -1,9 +1,10 @@
-import pytest_flask
+# External modules
 import pytest
+from datetime import datetime
+# Local modules
 from app import create_app
 from app.models import db, User, Event
 from app.extensions import bcrypt
-from datetime import datetime
 
 @pytest.fixture(scope='module')
 def app():
