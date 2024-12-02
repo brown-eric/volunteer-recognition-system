@@ -1,12 +1,5 @@
-import pytest
-from tests.conftest import app, test_client, init_database
-from app.forms import RegistrationForm
-from app.models import User, Event
-from flask_wtf import FlaskForm
-from wtforms import ValidationError
-from app.extensions import bcrypt
-import email_validator
-import json
+from tests.conftest import test_client, init_database
+from app.models import Event
 
 def test_nologin_redirects(test_client):
     """
@@ -14,8 +7,8 @@ def test_nologin_redirects(test_client):
     WHEN any page requiring a user to be logged in is requested (GET)
     THEN check that the response redirects to the login page.
     """
-    response = test_client.get('/') # home page
-    assert response.status_code == 302
+    response = test_client.get('/', follow_redirects=True) # home page
+    assert response.request.path == '/login'
     response = test_client.get('/rewards')
     assert response.status_code == 302
     response = test_client.get('/edit_profile')
@@ -32,8 +25,6 @@ def test_nologin_redirects(test_client):
     assert response.status_code == 302
     response = test_client.get('/add_member')
     assert response.status_code == 302
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 302
     response = test_client.get('/remove_user')
     assert response.status_code == 302
     response = test_client.get('/login')
@@ -210,6 +201,7 @@ def test_event(test_client, init_database):
     response = test_client.get('/logout')
     response = login(test_client, 'testvolunteer@example.com', 'password123')
     response = test_client.get('/events')
+    # TODO: Fix Query.get warning
     events = Event.query.order_by(Event.date).all()
     test_event_id = events[0].id
     response = test_client.get(f'/signup_event/{test_event_id}')

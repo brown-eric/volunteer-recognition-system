@@ -20,7 +20,6 @@ def validate_email(form, email):
     if existing_user:
         raise ValidationError('Email address already registered.')
 
-# testing
 # TODO: Add a password dictionary check
 def validate_password(self, password):
     if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
@@ -64,8 +63,8 @@ class EditProfileForm(FlaskForm):
 
 class AddHoursForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
-    # we don't have to implement this, but an important thing to keep in mind is that only whole hours will be accepted, not increments.
-    # set an input range so there is no undefined behavior. IntegerField is prone to error without setting number range restrictions
+    # An important thing to keep in mind is that only whole hours will be accepted, not increments.
+    # An input range is set so there is no undefined behavior. IntegerField is prone to error without setting number range restrictions
     hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, max=10000, message="Hours must be greater than 0")])
     submit = SubmitField('Add Hours')
 
@@ -97,3 +96,6 @@ class CreateEventForm(FlaskForm):
 class AddMemberForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
     submit = SubmitField('Add Volunteer To Your Organization')
+
+# TODO
+# class ChangePasswordForm(FlaskForm):
