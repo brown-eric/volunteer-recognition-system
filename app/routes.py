@@ -94,8 +94,10 @@ def register():
             ('admin', 'Admin')
         ]
     else:
+        #only one admin
         form.role.choices = [
-            ('volunteer', 'Volunteer')
+            ('volunteer', 'Volunteer'),
+            ('volunteering organization', 'Volunteering Organization')
         ]
     if form.validate_on_submit():
         name = escape(form.name.data)
