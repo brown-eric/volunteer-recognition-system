@@ -1,4 +1,3 @@
-# app/email.py
 from flask_mail import Message
 from app.extensions import mail
 

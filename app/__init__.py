@@ -1,7 +1,6 @@
 # Flask modules
 from flask import Flask
 from flask_migrate import Migrate
-from flask_mail import Mail
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 
@@ -25,7 +24,8 @@ def create_app(debug: bool = False) -> Flask:
 
     # Initialize extensions
     from app.extensions import db, bcrypt, csrf, login_manager
-    db.init_app(app)
+    with app.app_context():
+        db.init_app(app)
     csrf.init_app(app)
     bcrypt.init_app(app)
     login_manager.init_app(app)

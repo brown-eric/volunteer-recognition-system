@@ -1,5 +1,4 @@
 # Flask modules
-#from crypt import methods
 import string
 import secrets
 from markupsafe import escape
@@ -88,7 +87,16 @@ def register():
         return redirect(url_for("routes.home"))
 
     form = RegistrationForm()
-
+    if User.query.filter_by(role='admin').count() < 1:
+        form.role.choices = [
+            ('volunteer', 'Volunteer'),
+            ('volunteering organization', 'Volunteering Organization'),
+            ('admin', 'Admin')
+        ]
+    else:
+        form.role.choices = [
+            ('volunteer', 'Volunteer')
+        ]
     if form.validate_on_submit():
         name = escape(form.name.data)
         email = escape(form.email.data)
@@ -144,7 +152,7 @@ def rewards():
         {'name': 'Bronze Badge', 'description': 'Awarded for 10 volunteer hours', 'threshold': 10},
         {'name': 'Silver Badge', 'description': 'Awarded for 20 volunteer hours', 'threshold': 20},
         {'name': 'Gold Badge', 'description': 'Awarded for 30 volunteer hours', 'threshold': 30},
-        {'name': 'Platinum Badge', 'description': 'Awarded for 50 volunteer hours', 'threshold': 50},
+        {'name': 'Platinum Badge', 'description': 'Awarded for 50 volunteer hours', 'threshold': 50}
     ]
 
     user_rewards = [reward for reward in rewards if total_hours >= reward['threshold']]
@@ -339,9 +347,13 @@ def signup_event(event_id):
         return redirect(url_for('routes.events'))
 
     if event:
-        event.attendees.append(current_user)
-        db.session.commit()
-        flash('Successfully signed up for the event!', 'success')
+        if current_user in event.attendees:
+            flash('Volunteer already signed up for this event.')
+            return redirect(url_for('routes.events'))
+        else:
+            event.attendees.append(current_user)
+            db.session.commit()
+            flash('Successfully signed up for the event!', 'success')
     else:
         flash('Event not found.', 'danger')
 
@@ -350,6 +362,9 @@ def signup_event(event_id):
 @routes_bp.route("/add_member", methods=['GET', 'POST'])
 @login_required
 def add_member():
+    if current_user.role == 'admin':
+        flash('You do not have permission to add members.', 'danger')
+        return redirect(url_for('routes.home'))
     form = AddMemberForm()
     email_invalid = False  # Flag for invalid email
 

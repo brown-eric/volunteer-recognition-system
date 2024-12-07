@@ -1,6 +1,9 @@
-import unittest
+# Local modules
 from app.models import User, Event
 from app.extensions import bcrypt
+
+# External modules
+import unittest
 from datetime import datetime
 
 class TestNewUser(unittest.TestCase):

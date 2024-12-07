@@ -1,4 +1,3 @@
-
 # Flask modules
 from flask_wtf import FlaskForm
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp, NumberRange
@@ -20,7 +19,6 @@ def validate_email(form, email):
     if existing_user:
         raise ValidationError('Email address already registered.')
 
-# testing
 # TODO: Add a password dictionary check
 def validate_password(self, password):
     if not any(c.isalpha() for c in password.data) or not any(c.isdigit() for c in password.data):
@@ -43,9 +41,8 @@ class RegistrationForm(FlaskForm):
     confirm_password = PasswordField('Confirm Password', validators=[
         DataRequired(), Length(max=64),
         EqualTo('password', message='Passwords must match')
-    ],
+        ],
                                      render_kw={'placeholder': 'Confirm your password'})
-    # VULN: No controls to prevent any user from registering as an org or admin
     role = SelectField('Are you a', choices=[('volunteer', 'Volunteer'), ('volunteering organization', 'Volunteering Organization'),
                                              ('admin', 'Admin')], validators=[DataRequired()])
     submit = SubmitField('Register')
@@ -65,8 +62,8 @@ class EditProfileForm(FlaskForm):
 
 class AddHoursForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
-    # we don't have to implement this, but an important thing to keep in mind is that only whole hours will be accepted, not increments.
-    # set an input range so there is no undefined behavior. IntegerField is prone to error without setting number range restrictions
+    # An important thing to keep in mind is that only whole hours will be accepted, not increments.
+    # An input range is set so there is no undefined behavior. IntegerField is prone to error without setting number range restrictions
     hours = IntegerField('Hours to Add', validators=[DataRequired(), NumberRange(min=1, max=10000, message="Hours must be greater than 0")])
     submit = SubmitField('Add Hours')
 
@@ -92,9 +89,12 @@ class RemoveUserForm(FlaskForm):
 class CreateEventForm(FlaskForm):
     title = StringField('Event Title', validators=[DataRequired(), Length(max=80)])
     description = TextAreaField('Description', validators=[DataRequired(), Length(max=300)])
-    date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired(), Length(min=12, max=16)], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
+    date = DateTimeField('Event Date (YYYY-MM-DD HH:MM)', format='%Y-%m-%d %H:%M', validators=[DataRequired()], description="Input date and time in proper format: YYYY-MM-DD HH:MM")
     submit = SubmitField('Create Event')
 
 class AddMemberForm(FlaskForm):
     email = StringField('User Email', validators=[DataRequired(), Email(), Length(max=64)])
     submit = SubmitField('Add Volunteer To Your Organization')
+
+# TODO
+# class ChangePasswordForm(FlaskForm):

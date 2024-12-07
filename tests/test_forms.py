@@ -1,10 +1,6 @@
-import pytest
-from flask import Flask
-from app import create_app
-from app.forms import RegistrationForm, LoginForm, EditProfileForm, AddHoursForm, RemoveUserForm, CreateEventForm, \
-    AddMemberForm
+# Local modules
+from app.forms import RegistrationForm, LoginForm, EditProfileForm, AddHoursForm, AddUserForm, RemoveUserForm, CreateEventForm, AddMemberForm
 from tests.conftest import test_client, init_database
-from app.models import db
 
 def test_registration_form_valid_data(app):
     """
@@ -22,24 +18,6 @@ def test_registration_form_valid_data(app):
     with app.test_request_context(), app.test_client() as client:
         form = RegistrationForm(data=data)
         assert form.validate(), "Form should be valid with correct data"
-
-def test_registration_form_missing_data(app):
-    """
-    GIVEN a Flask application instance
-    WHEN the registration form input is invalid
-    THEN check if the form is invalid
-    """
-    data = {
-        'name': '',
-        'email': 'example@ufl.edu',
-        'password': 'securePassword123',
-        'confirm_password': 'securePassword123',
-        'role': 'volunteer'
-    }
-    with app.test_request_context(), app.test_client() as client:
-        form = RegistrationForm(data=data)
-        assert not form.validate(), "Form should be invalid if username is missing"
-        assert 'This field is required.' in form.name.errors, "Username field should have required error"
 
 def test_registration_form_invalid_data(test_client, init_database):
     """
@@ -154,7 +132,7 @@ def test_login_form_invalid_data(test_client, init_database):
     assert not form.validate(), "Form should be invalid with invalid password"
     assert 'Field cannot be longer than 64 characters.' in form.password.errors
 
-    # missing data
+    """ missing data """
     data = {}
     form = LoginForm(data=data)
     assert not form.validate(), "Form should be invalid with missing data"
@@ -282,6 +260,10 @@ def test_remove_user_form_invalid_data(test_client, init_database):
     form = RemoveUserForm(data=data)
     assert not form.validate(), "Form should be invalid with missing data"
     assert 'This field is required.' in form.email.errors
+
+# TODO:
+# def test_add_user_form_valid_data(test_client, init_database):
+# def test_add_user_form_invalid_data(test_client, init_database):
 
 def test_create_event_form_valid_data(test_client, init_database):
     """

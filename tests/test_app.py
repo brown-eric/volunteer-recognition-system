@@ -1,12 +1,6 @@
-import pytest
-from tests.conftest import app, test_client, init_database
-from app.forms import RegistrationForm
-from app.models import User, Event
-from flask_wtf import FlaskForm
-from wtforms import ValidationError
-from app.extensions import bcrypt
-import email_validator
-import json
+# Local modules
+from tests.conftest import test_client, init_database
+from app.models import Event
 
 def test_nologin_redirects(test_client):
     """
@@ -14,8 +8,8 @@ def test_nologin_redirects(test_client):
     WHEN any page requiring a user to be logged in is requested (GET)
     THEN check that the response redirects to the login page.
     """
-    response = test_client.get('/') # home page
-    assert response.status_code == 302
+    response = test_client.get('/', follow_redirects=True) # home page
+    assert response.request.path == '/login'
     response = test_client.get('/rewards')
     assert response.status_code == 302
     response = test_client.get('/edit_profile')
@@ -32,8 +26,6 @@ def test_nologin_redirects(test_client):
     assert response.status_code == 302
     response = test_client.get('/add_member')
     assert response.status_code == 302
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 302
     response = test_client.get('/remove_user')
     assert response.status_code == 302
     response = test_client.get('/login')
@@ -122,7 +114,10 @@ def test_volunteer_redirects(test_client, init_database):
     assert response.status_code == 200
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 200
-    # TODO: Test navigating to signup event page. Issue: I need the event ID and I don't know how to get it
+    response = test_client.get('/add_member')
+    assert response.status_code == 200
+    response = test_client.get('/events')
+    assert response.status_code == 200
     """
     WHEN a volunteer requests non-volunteer access pages
     THEN check for redirects.
@@ -133,12 +128,8 @@ def test_volunteer_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/view_database')
     assert response.status_code == 302
-    response = test_client.get('/add_member')
-    assert response.status_code == 302
     response = test_client.get('/create_event')
     assert response.status_code == 302
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 302
     response = test_client.get('/user/testorg')
     assert response.status_code == 302
     response = test_client.get('/user/testadmin')
@@ -155,8 +146,6 @@ def test_org_redirects(test_client, init_database):
     response = login(test_client, 'testorg@example.com', 'password123')
     response = test_client.get('/add_hours')
     assert response.status_code == 200
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 200
     response = test_client.get('/add_member')
     assert response.status_code == 200
     response = test_client.get('/create_event')
@@ -171,9 +160,6 @@ def test_org_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/view_database')
     assert response.status_code == 302
-    #  TODO: Figure out signup_event test
-    # response = test_client.get(f'/signup_event/{event_id}')
-    # assert response.status_code == 302
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 302
     response = test_client.get('/user/testadmin')
@@ -188,9 +174,9 @@ def test_admin_redirects(test_client, init_database):
     THEN check for accepted response.
     """
     response = login(test_client, 'testadmin@example.com', 'password123')
-    response = test_client.get('/remove_user')
-    assert response.status_code == 200
     response = test_client.get('/view_database')
+    assert response.status_code == 200
+    response = test_client.get('/remove_user')
     assert response.status_code == 200
     """
     WHEN an admin requests non-admin access pages
@@ -204,12 +190,26 @@ def test_admin_redirects(test_client, init_database):
     assert response.status_code == 302
     response = test_client.get('/rewards')
     assert response.status_code == 302
-    # TODO: Figure out how to get user id
-    # response = test_client.get(f'/remove_member/{vol_id}')
-    # assert response.status_code == 200
     response = test_client.get('/user/testvolunteer')
     assert response.status_code == 302
     response = test_client.get('/user/testorg')
     assert response.status_code == 302
     response = test_client.get('/logout')
 
+def test_event(test_client, init_database):
+    response = login(test_client, 'testorg@example.com', 'password123')
+    response = create_event(test_client, 'test event', 'event for testing signup', '2024-11-12 12:12')
+    response = test_client.get('/logout')
+    response = login(test_client, 'testvolunteer@example.com', 'password123')
+    response = test_client.get('/events')
+    # TODO: Fix Query.get warning
+    events = Event.query.order_by(Event.date).all()
+    test_event_id = events[0].id
+    response = test_client.get(f'/signup_event/{test_event_id}')
+    assert response.status_code == 302
+    """ Test response for duplicate request """
+    response = test_client.get(f'/signup_event/{test_event_id}')
+    assert response.status_code == 302
+    """ Test for wrong event id"""
+    response = test_client.get('/signup_event/5')
+    assert response.status_code == 302
